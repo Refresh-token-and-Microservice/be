@@ -1,0 +1,31 @@
+server:
+  port: ${PORT:8080}
+spring:
+  application:
+    name: refresh-token
+  profiles:
+    active: dev
+  config:
+    import: optional:file:.env[.properties]
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+    docs-expansion: none
+    filter: true
+management:
+  endpoints:
+    web:
+      base-path: /manage
+      exposure:
+        include: health,info,metrics,loggers
+  endpoint:
+    health:
+      show-details: when_authorized
+
+
