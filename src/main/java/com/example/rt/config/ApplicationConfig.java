@@ -1,6 +1,6 @@
 package com.example.rt.config;
 
-import com.example.rt.repository.UserRepository; // Import UserRepository của bạn
+import com.example.rt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
