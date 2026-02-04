@@ -29,7 +29,7 @@ public class SecurityConfig {
     private static final String[] PUBLIC_CORS_URL = {
             "http://localhost:5173",
     };
-    private static final String[] PUBLIC_CORS_METHODS = {"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"};
+    private static final String[] PUBLIC_CORS_METHODS = { "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS" };
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
@@ -63,13 +63,12 @@ public class SecurityConfig {
                                 "/configuration/security",
                                 "/swagger-ui/**",
                                 "/webjars/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
+                                "/swagger-ui.html")
+                        .permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/employee/**").hasAuthority("EMPLOYEE")
                         .requestMatchers("/demo/**").authenticated()
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
