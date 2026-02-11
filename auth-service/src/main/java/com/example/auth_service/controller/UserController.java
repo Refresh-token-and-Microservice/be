@@ -1,13 +1,13 @@
-package com.example.api_gateway.controller;
+package com.example.auth_service.controller;
 
-import com.example.api_gateway.dto.request.UserRequest;
-import com.example.api_gateway.dto.response.UserResponse;
-import com.example.api_gateway.entity.RefreshToken;
-import com.example.api_gateway.entity.User;
-import com.example.api_gateway.service.JwtService;
-import com.example.api_gateway.service.RefreshTokenService;
-import com.example.api_gateway.service.UserService;
-import com.example.api_gateway.util.ResponseFactory;
+import com.example.auth_service.dto.request.UserRequest;
+import com.example.auth_service.dto.response.UserResponse;
+import com.example.auth_service.entity.RefreshToken;
+import com.example.auth_service.entity.User;
+import com.example.auth_service.service.JwtService;
+import com.example.auth_service.service.RefreshTokenService;
+import com.example.auth_service.service.UserService;
+import com.example.auth_service.util.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -57,11 +57,11 @@ public class UserController {
         if (userOpt.isPresent()) {
             UserResponse userResponse = userOpt.get();
 
-            // 1. Tạo Access Token (JWT)
-            String accessToken = jwtService.generateAccessToken(userResponse.getEmail());
+            // 1. Tạo Access Token (JWT) - Now includes Roles and ID as claims
+            String accessToken = jwtService.generateAccessToken(userResponse);
 
             // 2. Tạo Refresh Token (UUID lưu DB)
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(Long.valueOf(userResponse.getId()));
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userResponse.getId());
 
             // 3. Đóng gói vào Cookie (Lưu ý chia thời gian cho 1000)
             ResponseCookie refreshCookie = createCookie("refresh_token", refreshToken.getToken(), REFRESH_TOKEN_TIME);
@@ -99,28 +99,29 @@ public class UserController {
         }
 
         try {
-            // 1. Tìm token trong Database và 2. Kiểm tra hết hạn
             RefreshToken verifiedToken = refreshTokenService.verifyExpiration(
                     refreshTokenService.findByToken(requestRefreshToken)
                             .orElseThrow(() -> new RuntimeException("Refresh token is not in database!")));
 
-            // 3. Lấy thông tin User
             User user = verifiedToken.getUser();
 
-            // 4. Tạo Access Token MỚI
-            String newAccessToken = jwtService.generateAccessToken(user.getEmail());
+            // Handle rotation with new claims-based token
+            // Map User entity to UserResponse for JwtService
+            UserResponse userResponse = UserResponse.builder()
+                    .id(Long.valueOf(user.getId()))
+                    .email(user.getEmail())
+                    .roles(user.getRoles().stream().map(r -> r.getRoleName())
+                            .collect(java.util.stream.Collectors.toSet()))
+                    .build();
 
-            // 5. Tạo Refresh Token MỚI (Cơ chế Rotation)
-            // Hàm createRefreshToken của bạn sẽ update bản ghi cũ thành token UUID mới và
-            // hạn mới
-            RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(Long.valueOf(user.getId()));
+            String newAccessToken = jwtService.generateAccessToken(userResponse);
 
-            // 6. Tạo 2 Cookie MỚI (Ghi đè cái cũ trên trình duyệt)
+            RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(userResponse.getId());
+
             ResponseCookie newAccessCookie = createCookie("access_token", newAccessToken, ACCESS_TOKEN_EXPIRATION);
             ResponseCookie newRefreshCookie = createCookie("refresh_token", newRefreshToken.getToken(),
                     REFRESH_TOKEN_TIME);
 
-            // 7. Trả về cả 2 Cookie
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, newAccessCookie.toString(), newRefreshCookie.toString())
                     .body(ResponseFactory.payload("Token refreshed and rotated successfully", null));

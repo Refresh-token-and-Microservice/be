@@ -20,17 +20,6 @@ spring:
             - Path=/api/**
           filters:
             - AuthenticationFilter
-  datasource:
-    url: jdbc:postgresql://localhost:5432/refresh-token
-    username: postgres
-    password: "123456"
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
 
 # Custom Properties
 JWT_SECRET_KEY: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970

@@ -1,9 +1,9 @@
-package com.example.api_gateway.service;
+package com.example.auth_service.service;
 
-import com.example.api_gateway.entity.RefreshToken;
-import com.example.api_gateway.entity.User;
-import com.example.api_gateway.repository.RefreshTokenRepository;
-import com.example.api_gateway.repository.UserRepository;
+import com.example.auth_service.entity.RefreshToken;
+import com.example.auth_service.entity.User;
+import com.example.auth_service.repository.RefreshTokenRepository;
+import com.example.auth_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class RefreshTokenService {
     private UserRepository userRepository;
 
     public RefreshToken createRefreshToken(Long userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findById(Math.toIntExact(userId))
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         RefreshToken refreshToken = refreshTokenRepository.findByUser(user)

@@ -1,7 +1,7 @@
-package com.example.api_gateway.service;
+package com.example.auth_service.service;
 
-import com.example.api_gateway.dto.request.UserRequest;
-import com.example.api_gateway.dto.response.UserResponse;
+import com.example.auth_service.dto.request.UserRequest;
+import com.example.auth_service.dto.response.UserResponse;
 
 import java.util.Optional;
 

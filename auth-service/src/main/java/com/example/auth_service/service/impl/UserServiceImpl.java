@@ -1,11 +1,11 @@
-package com.example.api_gateway.service.impl;
+package com.example.auth_service.service.impl;
 
-import com.example.api_gateway.dto.request.UserRequest;
-import com.example.api_gateway.dto.response.UserResponse;
-import com.example.api_gateway.entity.User;
-import com.example.api_gateway.mapper.UserMapper;
-import com.example.api_gateway.repository.UserRepository;
-import com.example.api_gateway.service.UserService;
+import com.example.auth_service.dto.request.UserRequest;
+import com.example.auth_service.dto.response.UserResponse;
+import com.example.auth_service.entity.User;
+import com.example.auth_service.mapper.UserMapper;
+import com.example.auth_service.repository.UserRepository;
+import com.example.auth_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

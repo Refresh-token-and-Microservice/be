@@ -1,9 +1,9 @@
-package com.example.api_gateway.config;
+package com.example.auth_service.config;
 
-import com.example.api_gateway.entity.Role;
-import com.example.api_gateway.entity.User;
-import com.example.api_gateway.repository.RoleRepository;
-import com.example.api_gateway.repository.UserRepository;
+import com.example.auth_service.entity.Role;
+import com.example.auth_service.entity.User;
+import com.example.auth_service.repository.RoleRepository;
+import com.example.auth_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,11 +22,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // 1. Tạo Roles nếu chưa có
         Role adminRole = createRoleIfNotFound("ADMIN");
         Role employeeRole = createRoleIfNotFound("EMPLOYEE");
 
-        // 2. Tạo User Admin mẫu (password: 123456)
         if (userRepository.findByEmail("admin@test.com").isEmpty()) {
             User admin = User.builder()
                     .email("admin@test.com")
@@ -36,7 +34,6 @@ public class DataInitializer implements CommandLineRunner {
             userRepository.save(admin);
         }
 
-        // 3. Tạo User Employee mẫu (password: 123456)
         if (userRepository.findByEmail("employee@test.com").isEmpty()) {
             User employee = User.builder()
                     .email("employee@test.com")

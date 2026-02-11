@@ -1,4 +1,4 @@
-package com.example.api_gateway.entity;
+package com.example.auth_service.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

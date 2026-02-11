@@ -1,6 +1,6 @@
-package com.example.api_gateway.config;
+package com.example.auth_service.config;
 
-import com.example.api_gateway.service.JwtService;
+import com.example.auth_service.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -22,8 +22,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService; // Đảm bảo bạn đã có Bean này (thường là UserService implements
-                                                         // UserDetailsService)
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -34,7 +33,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = null;
         String userEmail = null;
 
-        // 1. Lấy Access Token từ Cookie
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("access_token".equals(cookie.getName())) {
@@ -44,23 +42,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        // Nếu không có token trong cookie, cho qua (để đến Controller xử lý lỗi 403
-        // sau)
         if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 2. Giải mã token lấy Email
         try {
             userEmail = jwtService.extractUsername(token);
         } catch (Exception e) {
-            // Token lỗi hoặc hết hạn -> Không set Authentication -> User coi như chưa login
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 3. Validate và Set Context
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
@@ -71,7 +64,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // ĐÁNH DẤU LÀ ĐÃ ĐĂNG NHẬP THÀNH CÔNG
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }

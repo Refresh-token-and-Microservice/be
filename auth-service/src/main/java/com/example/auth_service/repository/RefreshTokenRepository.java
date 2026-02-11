@@ -1,7 +1,7 @@
-package com.example.api_gateway.repository;
+package com.example.auth_service.repository;
 
-import com.example.api_gateway.entity.RefreshToken;
-import com.example.api_gateway.entity.User;
+import com.example.auth_service.entity.RefreshToken;
+import com.example.auth_service.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

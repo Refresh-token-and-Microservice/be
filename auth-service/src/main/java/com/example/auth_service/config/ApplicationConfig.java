@@ -1,6 +1,6 @@
-package com.example.api_gateway.config;
+package com.example.auth_service.config;
 
-import com.example.api_gateway.repository.UserRepository;
+import com.example.auth_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
