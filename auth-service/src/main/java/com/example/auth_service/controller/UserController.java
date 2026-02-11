@@ -1,6 +1,7 @@
 package com.example.auth_service.controller;
 
 import com.example.auth_service.dto.request.UserRequest;
+import com.example.auth_service.dto.response.LoginResponse;
 import com.example.auth_service.dto.response.UserResponse;
 import com.example.auth_service.entity.RefreshToken;
 import com.example.auth_service.entity.User;
@@ -67,10 +68,16 @@ public class UserController {
             ResponseCookie refreshCookie = createCookie("refresh_token", refreshToken.getToken(), REFRESH_TOKEN_TIME);
             ResponseCookie accessCookie = createCookie("access_token", accessToken, ACCESS_TOKEN_EXPIRATION);
 
+            // 4. Create LoginResponse without roles
+            LoginResponse loginResponse = LoginResponse.builder()
+                    .id(userResponse.getId())
+                    .email(userResponse.getEmail())
+                    .build();
+
             return ResponseEntity.ok()
                     // Add cả 2 cookie vào header an toàn
                     .header(HttpHeaders.SET_COOKIE, accessCookie.toString(), refreshCookie.toString())
-                    .body(ResponseFactory.payload("Login successful", userResponse));
+                    .body(ResponseFactory.payload("Login successful", loginResponse));
         } else {
             return ResponseFactory.error(401, "INVALID_CREDENTIALS", "Invalid email or password", "/auth/login");
         }
