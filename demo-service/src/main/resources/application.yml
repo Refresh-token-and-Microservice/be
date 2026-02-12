@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: resource-service
+  profiles:
+    active: dev
 
 eureka:
   client:

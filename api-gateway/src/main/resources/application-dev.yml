@@ -1,0 +1,20 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  # Log levels or specific dev settings can go here if needed to override defaults
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: auth-service
+            uri: lb://AUTH-SERVICE
+            predicates:
+              - Path=/auth/**
+
+          - id: resource-service
+            uri: lb://RESOURCE-SERVICE
+            predicates:
+              - Path=/api/**
+            filters:
+              - AuthenticationFilter
