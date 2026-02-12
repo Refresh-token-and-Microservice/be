@@ -23,6 +23,11 @@ public class GatewayConfig {
                         .route(RequestPredicates.path("/api/**"), http())
                         .filter(authenticationFilter)
                         .filter(lb("RESOURCE-SERVICE"))
+                        .build())
+                .and(route("user-service")
+                        .route(RequestPredicates.path("/user/**"), http())
+                        .filter(authenticationFilter)
+                        .filter(lb("USER-SERVICE"))
                         .build());
     }
 }
