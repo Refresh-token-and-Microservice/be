@@ -19,6 +19,9 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private com.example.auth_service.repository.RoleRepository roleRepository;
+
+    @Autowired
     private UserMapper userMapper;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -27,6 +30,24 @@ public class UserServiceImpl implements UserService {
     public UserResponse register(UserRequest userRequest) {
         User user = userMapper.toEntity(userRequest);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // Handle Role
+        String roleName = userRequest.getRole();
+        if (roleName == null || roleName.isEmpty()) {
+            roleName = "EMPLOYEE"; // Default role
+        } else {
+            roleName = roleName.toUpperCase();
+            if (!roleName.equals("ADMIN") && !roleName.equals("EMPLOYEE")) {
+                throw new RuntimeException("Invalid role! Role must be ADMIN or EMPLOYEE");
+            }
+        }
+
+        String finalRoleName = roleName;
+        com.example.auth_service.entity.Role role = roleRepository.findByRoleName(roleName)
+                .orElseGet(() -> roleRepository
+                        .save(com.example.auth_service.entity.Role.builder().roleName(finalRoleName).build()));
+
+        user.setRoles(java.util.Collections.singleton(role));
 
         User savedUser = userRepository.save(user);
         return userMapper.toResponse(savedUser);
