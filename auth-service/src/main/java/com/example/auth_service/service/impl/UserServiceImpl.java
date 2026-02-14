@@ -6,7 +6,7 @@ import com.example.auth_service.entity.User;
 import com.example.auth_service.mapper.UserMapper;
 import com.example.auth_service.repository.UserRepository;
 import com.example.auth_service.service.UserService;
-import com.example.common.event.AuthRegisteredEvent;
+import com.example.common_dto.event.AuthRegisteredEvent;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

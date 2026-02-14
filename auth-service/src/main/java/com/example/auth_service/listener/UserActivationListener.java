@@ -2,7 +2,7 @@ package com.example.auth_service.listener;
 
 import com.example.auth_service.entity.User;
 import com.example.auth_service.repository.UserRepository;
-import com.example.common.command.ActivateUserCommand;
+import com.example.common_dto.command.ActivateUserCommand;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

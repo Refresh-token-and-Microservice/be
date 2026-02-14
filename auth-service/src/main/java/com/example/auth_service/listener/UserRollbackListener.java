@@ -1,7 +1,7 @@
 package com.example.auth_service.listener;
 
 import com.example.auth_service.repository.UserRepository;
-import com.example.common.command.RollbackAuthCommand;
+import com.example.common_dto.command.RollbackAuthCommand;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

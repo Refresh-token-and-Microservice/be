@@ -1,12 +1,12 @@
 package com.example.orchestrator_service.service;
 
-import com.example.common.command.ActivateUserCommand;
-import com.example.common.command.CreateProfileCommand;
-import com.example.common.command.RollbackAuthCommand;
-import com.example.common.event.AuthRegisteredEvent;
-import com.example.common.event.ProfileCreatedEvent;
-import com.example.common.event.ProfileFailedEvent;
-import com.example.orchestrator.config.RabbitMQConfig;
+import com.example.common_dto.command.ActivateUserCommand;
+import com.example.common_dto.command.CreateProfileCommand;
+import com.example.common_dto.command.RollbackAuthCommand;
+import com.example.common_dto.event.AuthRegisteredEvent;
+import com.example.common_dto.event.ProfileCreatedEvent;
+import com.example.common_dto.event.ProfileFailedEvent;
+import com.example.orchestrator_service.config.RabbitMQConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

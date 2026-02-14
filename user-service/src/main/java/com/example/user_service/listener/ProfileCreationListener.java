@@ -1,8 +1,8 @@
 package com.example.user_service.listener;
 
-import com.example.common.command.CreateProfileCommand;
-import com.example.common.event.ProfileCreatedEvent;
-import com.example.common.event.ProfileFailedEvent;
+import com.example.common_dto.command.CreateProfileCommand;
+import com.example.common_dto.event.ProfileCreatedEvent;
+import com.example.common_dto.event.ProfileFailedEvent;
 import com.example.user_service.entity.User;
 import com.example.user_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
