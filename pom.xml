@@ -19,6 +19,8 @@
 		<module>api-gateway</module>
 		<module>demo-service</module>
 		<module>auth-service</module>
+		<module>orchestrator-service</module>
+		<module>common-dto</module>
 	</modules>
 
 	<properties>

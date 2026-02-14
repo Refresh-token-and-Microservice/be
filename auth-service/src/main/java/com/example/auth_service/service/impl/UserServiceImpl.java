@@ -6,9 +6,12 @@ import com.example.auth_service.entity.User;
 import com.example.auth_service.mapper.UserMapper;
 import com.example.auth_service.repository.UserRepository;
 import com.example.auth_service.service.UserService;
+import com.example.common.event.AuthRegisteredEvent;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -24,12 +27,17 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
+    @Transactional
     public UserResponse register(UserRequest userRequest) {
         User user = userMapper.toEntity(userRequest);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setStatus("PENDING"); // Set initial status as PENDING
 
         // Handle Role
         String roleName = userRequest.getRole();
@@ -49,7 +57,17 @@ public class UserServiceImpl implements UserService {
 
         user.setRoles(java.util.Collections.singleton(role));
 
+        // Save user first (within transaction)
         User savedUser = userRepository.save(user);
+
+        // Then publish event (still within transaction)
+        AuthRegisteredEvent event = AuthRegisteredEvent.builder()
+                .userId(savedUser.getId())
+                .email(savedUser.getEmail())
+                .build();
+
+        rabbitTemplate.convertAndSend("saga-exchange", "auth.user.registered", event);
+
         return userMapper.toResponse(savedUser);
     }
 
