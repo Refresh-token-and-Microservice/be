@@ -13,37 +13,20 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
+        private final UserRepository userRepository;
+        private final com.example.user_service.mapper.UserMapper userMapper;
 
-    @Override
-    public UserDto saveUser(UserDto userDto) {
-        User user = User.builder()
-                .userId(userDto.getUserId())
-                .firstName(userDto.getFirstName())
-                .lastName(userDto.getLastName())
-                .phone(userDto.getPhone())
-                .email(userDto.getEmail())
-                .build();
-        User savedUser = userRepository.save(user);
-        return UserDto.builder()
-                .userId(savedUser.getUserId())
-                .firstName(savedUser.getFirstName())
-                .lastName(savedUser.getLastName())
-                .phone(savedUser.getPhone())
-                .email(savedUser.getEmail())
-                .build();
-    }
+        @Override
+        public UserDto saveUser(UserDto userDto) {
+                User user = userMapper.toEntity(userDto);
+                User savedUser = userRepository.save(user);
+                return userMapper.toDto(savedUser);
+        }
 
-    @Override
-    public UserDto getUserById(String userId) {
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return UserDto.builder()
-                .userId(user.getUserId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .phone(user.getPhone())
-                .email(user.getEmail())
-                .build();
-    }
+        @Override
+        public UserDto getUserById(String userId) {
+                User user = userRepository.findByUserId(userId)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+                return userMapper.toDto(user);
+        }
 }
