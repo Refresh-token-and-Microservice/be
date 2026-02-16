@@ -7,6 +7,8 @@ import com.example.user_service.entity.User;
 import com.example.user_service.repository.UserRepository;
 import com.example.user_service.service.UserService;
 
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,5 +30,30 @@ public class UserServiceImpl implements UserService {
                 User user = userRepository.findByUserId(userId)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
                 return userMapper.toDto(user);
+        }
+
+        @Override
+        public List<UserDto> getAllUsers() {
+                return userRepository.findAll().stream()
+                                .map(userMapper::toDto)
+                                .collect(java.util.stream.Collectors.toList());
+        }
+
+        @Override
+        public UserDto updateUser(String userId, UserDto userDto) {
+                User user = userRepository.findByUserId(userId)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+
+                userMapper.updateEntityFromDto(userDto, user);
+                User updatedUser = userRepository.save(user);
+
+                return userMapper.toDto(updatedUser);
+        }
+
+        @Override
+        public void deleteUser(String userId) {
+                User user = userRepository.findByUserId(userId)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+                userRepository.delete(user);
         }
 }

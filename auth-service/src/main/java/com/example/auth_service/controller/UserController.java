@@ -8,7 +8,7 @@ import com.example.auth_service.entity.User;
 import com.example.auth_service.service.JwtService;
 import com.example.auth_service.service.RefreshTokenService;
 import com.example.auth_service.service.UserService;
-import com.example.auth_service.util.ResponseFactory;
+import com.example.common.util.ResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;

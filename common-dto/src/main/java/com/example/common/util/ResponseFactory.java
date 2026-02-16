@@ -1,7 +1,7 @@
-package com.example.auth_service.util;
+package com.example.common.util;
 
-import com.example.auth_service.dto.ApiResponse;
-import com.example.auth_service.dto.ErrorResponse;
+import com.example.common.dto.ApiResponse;
+import com.example.common.dto.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 
 import java.time.Instant;
