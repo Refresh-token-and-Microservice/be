@@ -7,41 +7,38 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.example.common_dto.constant.RabbitMQConstants;;
 
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String SAGA_EXCHANGE = "saga-exchange";
-    public static final String USER_ACTIVATE_QUEUE = "user.activate.queue";
-    public static final String AUTH_ROLLBACK_QUEUE = "auth.rollback.queue";
-
     @Bean
     public TopicExchange sagaExchange() {
-        return new TopicExchange(SAGA_EXCHANGE);
+        return new TopicExchange(RabbitMQConstants.SAGA_EXCHANGE);
     }
 
     @Bean
     public Queue userActivateQueue() {
-        return new Queue(USER_ACTIVATE_QUEUE, true);
+        return new Queue(RabbitMQConstants.USER_ACTIVATE_QUEUE, true);
     }
 
     @Bean
     public Queue authRollbackQueue() {
-        return new Queue(AUTH_ROLLBACK_QUEUE, true);
+        return new Queue(RabbitMQConstants.AUTH_ROLLBACK_QUEUE, true);
     }
 
     @Bean
     public Binding userActivateBinding() {
         return BindingBuilder.bind(userActivateQueue())
                 .to(sagaExchange())
-                .with("orchestrator.user.activate");
+                .with(RabbitMQConstants.ORCHESTRATOR_USER_ACTIVATE);
     }
 
     @Bean
     public Binding authRollbackBinding() {
         return BindingBuilder.bind(authRollbackQueue())
                 .to(sagaExchange())
-                .with("orchestrator.auth.rollback");
+                .with(RabbitMQConstants.ORCHESTRATOR_AUTH_ROLLBACK);
     }
 
     @Bean

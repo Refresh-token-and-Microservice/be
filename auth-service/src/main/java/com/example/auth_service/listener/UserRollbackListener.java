@@ -2,6 +2,8 @@ package com.example.auth_service.listener;
 
 import com.example.auth_service.repository.UserRepository;
 import com.example.common_dto.command.RollbackAuthCommand;
+import com.example.common_dto.constant.RabbitMQConstants;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -15,7 +17,7 @@ public class UserRollbackListener {
 
     private final UserRepository userRepository;
 
-    @RabbitListener(queues = "auth.rollback.queue")
+    @RabbitListener(queues = RabbitMQConstants.AUTH_ROLLBACK_QUEUE)
     @Transactional
     public void handleRollbackAuth(RollbackAuthCommand command) {
         log.warn("Received RollbackAuthCommand for userId: {}", command.getUserId());

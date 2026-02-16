@@ -1,6 +1,7 @@
 package com.example.user_service.listener;
 
 import com.example.common_dto.command.CreateProfileCommand;
+import com.example.common_dto.constant.RabbitMQConstants;
 import com.example.common_dto.event.ProfileCreatedEvent;
 import com.example.common_dto.event.ProfileFailedEvent;
 import com.example.user_service.entity.User;
@@ -20,7 +21,7 @@ public class ProfileCreationListener {
     private final UserRepository userRepository;
     private final RabbitTemplate rabbitTemplate;
 
-    @RabbitListener(queues = "profile.create.queue")
+    @RabbitListener(queues = RabbitMQConstants.PROFILE_CREATE_QUEUE)
     @Transactional
     public void handleCreateProfile(CreateProfileCommand command) {
         log.info("Received CreateProfileCommand: {}", command);
@@ -41,7 +42,8 @@ public class ProfileCreationListener {
                     .userId(command.getUserId())
                     .build();
 
-            rabbitTemplate.convertAndSend("saga-exchange", "user.profile.created", event);
+            rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE, RabbitMQConstants.USER_PROFILE_CREATED,
+                    event);
             log.info("Published ProfileCreatedEvent: {}", event);
 
         } catch (Exception e) {
@@ -53,7 +55,8 @@ public class ProfileCreationListener {
                     .reason(e.getMessage())
                     .build();
 
-            rabbitTemplate.convertAndSend("saga-exchange", "user.profile.failed", event);
+            rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE, RabbitMQConstants.USER_PROFILE_FAILED,
+                    event);
             log.info("Published ProfileFailedEvent: {}", event);
         }
     }

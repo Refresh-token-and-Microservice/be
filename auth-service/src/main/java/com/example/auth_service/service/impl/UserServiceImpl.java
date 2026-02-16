@@ -6,6 +6,7 @@ import com.example.auth_service.entity.User;
 import com.example.auth_service.mapper.UserMapper;
 import com.example.auth_service.repository.UserRepository;
 import com.example.auth_service.service.UserService;
+import com.example.common_dto.constant.RabbitMQConstants;
 import com.example.common_dto.event.AuthRegisteredEvent;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +67,7 @@ public class UserServiceImpl implements UserService {
                 .email(savedUser.getEmail())
                 .build();
 
-        rabbitTemplate.convertAndSend("saga-exchange", "auth.user.registered", event);
+        rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE, RabbitMQConstants.AUTH_USER_REGISTERED, event);
 
         return userMapper.toResponse(savedUser);
     }

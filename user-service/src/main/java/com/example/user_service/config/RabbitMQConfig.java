@@ -8,27 +8,26 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.example.common_dto.constant.RabbitMQConstants;
+
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String SAGA_EXCHANGE = "saga-exchange";
-    public static final String PROFILE_CREATE_QUEUE = "profile.create.queue";
-
     @Bean
     public TopicExchange sagaExchange() {
-        return new TopicExchange(SAGA_EXCHANGE);
+        return new TopicExchange(RabbitMQConstants.SAGA_EXCHANGE);
     }
 
     @Bean
     public Queue profileCreateQueue() {
-        return new Queue(PROFILE_CREATE_QUEUE, true);
+        return new Queue(RabbitMQConstants.PROFILE_CREATE_QUEUE, true);
     }
 
     @Bean
     public Binding profileCreateBinding() {
         return BindingBuilder.bind(profileCreateQueue())
                 .to(sagaExchange())
-                .with("orchestrator.profile.create");
+                .with(RabbitMQConstants.ORCHESTRATOR_PROFILE_CREATE);
     }
 
     @Bean
