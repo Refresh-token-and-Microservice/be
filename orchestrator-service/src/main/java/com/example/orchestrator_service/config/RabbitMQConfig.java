@@ -59,6 +59,43 @@ public class RabbitMQConfig {
         return new Jackson2JsonMessageConverter();
     }
 
+    // Email Update Saga Queues
+    @Bean
+    public Queue emailUpdateRequestedQueue() {
+        return new Queue(RabbitMQConstants.EMAIL_UPDATE_REQUESTED_QUEUE, true);
+    }
+
+    @Bean
+    public Queue authEmailUpdatedQueue() {
+        return new Queue(RabbitMQConstants.AUTH_EMAIL_UPDATED_QUEUE, true);
+    }
+
+    @Bean
+    public Queue authEmailUpdateFailedQueue() {
+        return new Queue(RabbitMQConstants.AUTH_EMAIL_UPDATE_FAILED_QUEUE, true);
+    }
+
+    @Bean
+    public Binding emailUpdateRequestedBinding() {
+        return BindingBuilder.bind(emailUpdateRequestedQueue())
+                .to(sagaExchange())
+                .with(RabbitMQConstants.EMAIL_UPDATE_REQUESTED);
+    }
+
+    @Bean
+    public Binding authEmailUpdatedBinding() {
+        return BindingBuilder.bind(authEmailUpdatedQueue())
+                .to(sagaExchange())
+                .with(RabbitMQConstants.AUTH_EMAIL_UPDATED);
+    }
+
+    @Bean
+    public Binding authEmailUpdateFailedBinding() {
+        return BindingBuilder.bind(authEmailUpdateFailedQueue())
+                .to(sagaExchange())
+                .with(RabbitMQConstants.AUTH_EMAIL_UPDATE_FAILED);
+    }
+
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);

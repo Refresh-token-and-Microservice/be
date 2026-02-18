@@ -28,7 +28,9 @@ public class User {
     private String lastName;
     private String phone;
     private String email;
+    private String pendingEmail;
 
     @Version
-    private Integer version;
+    @Builder.Default
+    private Integer version = 0;
 }

@@ -26,4 +26,18 @@ public class RabbitMQConstants {
 
     public static final String PROFILE_FAILED_QUEUE = "profile.failed.queue";
 
+    // Email Update Saga
+    public static final String EMAIL_UPDATE_REQUESTED = "user.email.update.requested";
+    public static final String ORCHESTRATOR_AUTH_EMAIL_UPDATE = "orchestrator.auth.email.update";
+    public static final String AUTH_EMAIL_UPDATED = "auth.email.updated";
+    public static final String AUTH_EMAIL_UPDATE_FAILED = "auth.email.update.failed";
+    public static final String ORCHESTRATOR_USER_CONFIRM_EMAIL = "orchestrator.user.confirm.email";
+    public static final String ORCHESTRATOR_USER_DISCARD_EMAIL = "orchestrator.user.discard.email";
+
+    public static final String EMAIL_UPDATE_REQUESTED_QUEUE = "email.update.requested.queue";
+    public static final String UPDATE_AUTH_EMAIL_QUEUE = "update.auth.email.queue";
+    public static final String AUTH_EMAIL_UPDATED_QUEUE = "auth.email.updated.queue";
+    public static final String AUTH_EMAIL_UPDATE_FAILED_QUEUE = "auth.email.update.failed.queue";
+    public static final String CONFIRM_EMAIL_UPDATE_QUEUE = "confirm.email.update.queue";
+    public static final String DISCARD_EMAIL_UPDATE_QUEUE = "discard.email.update.queue";
 }

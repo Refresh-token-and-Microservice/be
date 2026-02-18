@@ -42,6 +42,18 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue updateAuthEmailQueue() {
+        return new Queue(RabbitMQConstants.UPDATE_AUTH_EMAIL_QUEUE, true);
+    }
+
+    @Bean
+    public Binding updateAuthEmailBinding() {
+        return BindingBuilder.bind(updateAuthEmailQueue())
+                .to(sagaExchange())
+                .with(RabbitMQConstants.ORCHESTRATOR_AUTH_EMAIL_UPDATE);
+    }
+
+    @Bean
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }

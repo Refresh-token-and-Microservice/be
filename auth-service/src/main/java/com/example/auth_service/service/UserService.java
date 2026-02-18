@@ -9,4 +9,6 @@ public interface UserService {
     UserResponse register(UserRequest user);
 
     Optional<UserResponse> login(String email, String password);
+
+    UserResponse updateEmail(Integer userId, String newEmail);
 }

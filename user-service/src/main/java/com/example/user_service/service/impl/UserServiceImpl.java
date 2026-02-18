@@ -6,6 +6,10 @@ import com.example.user_service.dto.UserDto;
 import com.example.user_service.entity.User;
 import com.example.user_service.repository.UserRepository;
 import com.example.user_service.service.UserService;
+import com.example.common_dto.constant.RabbitMQConstants;
+import com.example.common_dto.event.EmailUpdateRequestedEvent;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.List;
 
@@ -17,6 +21,7 @@ public class UserServiceImpl implements UserService {
 
         private final UserRepository userRepository;
         private final com.example.user_service.mapper.UserMapper userMapper;
+        private final RabbitTemplate rabbitTemplate;
 
         @Override
         public UserDto saveUser(UserDto userDto) {
@@ -44,10 +49,35 @@ public class UserServiceImpl implements UserService {
                 User user = userRepository.findByUserId(userId)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+                String oldEmail = user.getEmail();
+                String newEmail = userDto.getEmail();
+                String emailStatus = null;
+
+                if (newEmail != null && !newEmail.equals(oldEmail)) {
+                        user.setPendingEmail(newEmail);
+                        emailStatus = "PENDING_UPDATE";
+
+                        // Publish event
+                        EmailUpdateRequestedEvent event = EmailUpdateRequestedEvent.builder()
+                                        .userId(userId)
+                                        .oldEmail(oldEmail)
+                                        .newEmail(newEmail)
+                                        .build();
+                        rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE,
+                                        RabbitMQConstants.EMAIL_UPDATE_REQUESTED, event);
+
+                        // Prevent email update in entity via mapper
+                        userDto.setEmail(null);
+                }
+
                 userMapper.updateEntityFromDto(userDto, user);
                 User updatedUser = userRepository.save(user);
 
-                return userMapper.toDto(updatedUser);
+                UserDto responseDto = userMapper.toDto(updatedUser);
+                if (emailStatus != null) {
+                        responseDto.setEmailStatus(emailStatus);
+                }
+                return responseDto;
         }
 
         @Override
@@ -55,5 +85,24 @@ public class UserServiceImpl implements UserService {
                 User user = userRepository.findByUserId(userId)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
                 userRepository.delete(user);
+        }
+
+        @Override
+        public void confirmEmailUpdate(String userId, String email) {
+                User user = userRepository.findByUserId(userId)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+                if (email.equals(user.getPendingEmail())) {
+                        user.setEmail(email);
+                        user.setPendingEmail(null);
+                        userRepository.save(user);
+                }
+        }
+
+        @Override
+        public void discardEmailUpdate(String userId) {
+                User user = userRepository.findByUserId(userId)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+                user.setPendingEmail(null);
+                userRepository.save(user);
         }
 }

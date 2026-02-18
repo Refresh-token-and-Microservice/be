@@ -31,6 +31,30 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue confirmEmailUpdateQueue() {
+        return new Queue(RabbitMQConstants.CONFIRM_EMAIL_UPDATE_QUEUE, true);
+    }
+
+    @Bean
+    public Queue discardEmailUpdateQueue() {
+        return new Queue(RabbitMQConstants.DISCARD_EMAIL_UPDATE_QUEUE, true);
+    }
+
+    @Bean
+    public Binding confirmEmailUpdateBinding() {
+        return BindingBuilder.bind(confirmEmailUpdateQueue())
+                .to(sagaExchange())
+                .with(RabbitMQConstants.ORCHESTRATOR_USER_CONFIRM_EMAIL);
+    }
+
+    @Bean
+    public Binding discardEmailUpdateBinding() {
+        return BindingBuilder.bind(discardEmailUpdateQueue())
+                .to(sagaExchange())
+                .with(RabbitMQConstants.ORCHESTRATOR_USER_DISCARD_EMAIL);
+    }
+
+    @Bean
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }

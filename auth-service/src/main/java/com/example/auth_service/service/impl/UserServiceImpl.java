@@ -82,4 +82,19 @@ public class UserServiceImpl implements UserService {
 
         return Optional.empty();
     }
+
+    @Override
+    @Transactional
+    public UserResponse updateEmail(Integer userId, String newEmail) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (userRepository.findByEmail(newEmail).isPresent()) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        user.setEmail(newEmail);
+        User savedUser = userRepository.save(user);
+        return userMapper.toResponse(savedUser);
+    }
 }
