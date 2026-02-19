@@ -4,6 +4,7 @@ import com.example.common_dto.command.ActivateUserCommand;
 import com.example.common_dto.command.CreateProfileCommand;
 import com.example.common_dto.command.RollbackAuthCommand;
 import com.example.common_dto.constant.RabbitMQConstants;
+import com.example.common_dto.constant.RegisterConstants;
 import com.example.common_dto.event.AuthRegisteredEvent;
 import com.example.common_dto.event.ProfileCreatedEvent;
 import com.example.common_dto.event.ProfileFailedEvent;
@@ -24,7 +25,7 @@ public class SagaOrchestrator {
      * Step 1: Listen for AuthRegisteredEvent from auth-service
      * Then send CreateProfileCommand to user-service
      */
-    @RabbitListener(queues = RabbitMQConstants.AUTH_REGISTERED_QUEUE)
+    @RabbitListener(queues = RegisterConstants.QUEUE_ORCHESTRATOR_USER_REGISTERED)
     public void handleAuthRegistered(AuthRegisteredEvent event) {
         log.info("Received AuthRegisteredEvent: {}", event);
 
@@ -37,7 +38,7 @@ public class SagaOrchestrator {
             log.info("Sending CreateProfileCommand to user-service: {}", command);
             rabbitTemplate.convertAndSend(
                     RabbitMQConstants.SAGA_EXCHANGE,
-                    RabbitMQConstants.ORCHESTRATOR_PROFILE_CREATE,
+                    RegisterConstants.COMMAND_PROFILE_CREATE,
                     command);
         } catch (Exception e) {
             log.error("Error handling AuthRegisteredEvent", e);
@@ -49,7 +50,7 @@ public class SagaOrchestrator {
      * Step 2a (SUCCESS): Listen for ProfileCreatedEvent from user-service
      * Then send ActivateUserCommand to auth-service
      */
-    @RabbitListener(queues = RabbitMQConstants.PROFILE_CREATED_QUEUE)
+    @RabbitListener(queues = RegisterConstants.QUEUE_PROFILE_CREATE)
     public void handleProfileCreated(ProfileCreatedEvent event) {
         log.info("Received ProfileCreatedEvent: {}", event);
 
@@ -60,7 +61,7 @@ public class SagaOrchestrator {
         log.info("Sending ActivateUserCommand to auth-service: {}", command);
         rabbitTemplate.convertAndSend(
                 RabbitMQConstants.SAGA_EXCHANGE,
-                RabbitMQConstants.ORCHESTRATOR_USER_ACTIVATE,
+                RegisterConstants.COMMAND_USER_ACTIVATE,
                 command);
 
         log.info("Saga completed successfully for userId: {}", event.getUserId());
@@ -70,7 +71,7 @@ public class SagaOrchestrator {
      * Step 2b (FAILURE): Listen for ProfileFailedEvent from user-service
      * Then send RollbackAuthCommand to auth-service (COMPENSATION)
      */
-    @RabbitListener(queues = RabbitMQConstants.PROFILE_FAILED_QUEUE)
+    @RabbitListener(queues = RegisterConstants.QUEUE_ORCHESTRATOR_PROFILE_FAILED)
     public void handleProfileFailed(ProfileFailedEvent event) {
         log.error("Received ProfileFailedEvent: {} - Reason: {}", event.getUserId(), event.getReason());
 
@@ -81,7 +82,7 @@ public class SagaOrchestrator {
         log.info("Sending RollbackAuthCommand to auth-service for compensation: {}", command);
         rabbitTemplate.convertAndSend(
                 RabbitMQConstants.SAGA_EXCHANGE,
-                RabbitMQConstants.ORCHESTRATOR_AUTH_ROLLBACK,
+                RegisterConstants.COMMAND_AUTH_ROLLBACK,
                 command);
 
         log.info("Saga rolled back for userId: {}", event.getUserId());

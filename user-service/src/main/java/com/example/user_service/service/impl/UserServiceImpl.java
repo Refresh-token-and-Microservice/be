@@ -7,6 +7,7 @@ import com.example.user_service.entity.User;
 import com.example.user_service.repository.UserRepository;
 import com.example.user_service.service.UserService;
 import com.example.common_dto.constant.RabbitMQConstants;
+import com.example.common_dto.constant.UpdateEmailConstants;
 import com.example.common_dto.event.EmailUpdateRequestedEvent;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -57,16 +58,14 @@ public class UserServiceImpl implements UserService {
                         user.setPendingEmail(newEmail);
                         emailStatus = "PENDING_UPDATE";
 
-                        // Publish event
                         EmailUpdateRequestedEvent event = EmailUpdateRequestedEvent.builder()
                                         .userId(userId)
                                         .oldEmail(oldEmail)
                                         .newEmail(newEmail)
                                         .build();
                         rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE,
-                                        RabbitMQConstants.EMAIL_UPDATE_REQUESTED, event);
+                                        UpdateEmailConstants.EVENT_EMAIL_UPDATE_REQUESTED, event);
 
-                        // Prevent email update in entity via mapper
                         userDto.setEmail(null);
                 }
 

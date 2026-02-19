@@ -2,6 +2,7 @@ package com.example.user_service.listener;
 
 import com.example.common_dto.command.CreateProfileCommand;
 import com.example.common_dto.constant.RabbitMQConstants;
+import com.example.common_dto.constant.RegisterConstants;
 import com.example.common_dto.event.ProfileCreatedEvent;
 import com.example.common_dto.event.ProfileFailedEvent;
 import com.example.user_service.entity.User;
@@ -18,46 +19,44 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class ProfileCreationListener {
 
-    private final UserRepository userRepository;
-    private final RabbitTemplate rabbitTemplate;
+        private final UserRepository userRepository;
+        private final RabbitTemplate rabbitTemplate;
 
-    @RabbitListener(queues = RabbitMQConstants.PROFILE_CREATE_QUEUE)
-    @Transactional
-    public void handleCreateProfile(CreateProfileCommand command) {
-        log.info("Received CreateProfileCommand: {}", command);
+        @RabbitListener(queues = RegisterConstants.QUEUE_PROFILE_CREATE)
+        @Transactional
+        public void handleCreateProfile(CreateProfileCommand command) {
+                log.info("Received CreateProfileCommand: {}", command);
 
-        try {
-            // Create user profile with userId from auth service
-            User user = User.builder()
-                    .userId(String.valueOf(command.getUserId()))
-                    .email(command.getEmail())
-                    // firstName, lastName, phone are null as mentioned
-                    .build();
+                try {
+                        User user = User.builder()
+                                        .userId(String.valueOf(command.getUserId()))
+                                        .email(command.getEmail())
+                                        .build();
 
-            User savedUser = userRepository.save(user);
-            log.info("User profile created successfully: {}", savedUser);
+                        User savedUser = userRepository.save(user);
+                        log.info("User profile created successfully: {}", savedUser);
 
-            // Publish success event
-            ProfileCreatedEvent event = ProfileCreatedEvent.builder()
-                    .userId(command.getUserId())
-                    .build();
+                        ProfileCreatedEvent event = ProfileCreatedEvent.builder()
+                                        .userId(command.getUserId())
+                                        .build();
 
-            rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE, RabbitMQConstants.USER_PROFILE_CREATED,
-                    event);
-            log.info("Published ProfileCreatedEvent: {}", event);
+                        rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE,
+                                        RegisterConstants.EVENT_PROFILE_CREATED,
+                                        event);
+                        log.info("Published ProfileCreatedEvent: {}", event);
 
-        } catch (Exception e) {
-            log.error("Failed to create user profile for userId: {}", command.getUserId(), e);
+                } catch (Exception e) {
+                        log.error("Failed to create user profile for userId: {}", command.getUserId(), e);
 
-            // Publish failure event
-            ProfileFailedEvent event = ProfileFailedEvent.builder()
-                    .userId(command.getUserId())
-                    .reason(e.getMessage())
-                    .build();
+                        ProfileFailedEvent event = ProfileFailedEvent.builder()
+                                        .userId(command.getUserId())
+                                        .reason(e.getMessage())
+                                        .build();
 
-            rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE, RabbitMQConstants.USER_PROFILE_FAILED,
-                    event);
-            log.info("Published ProfileFailedEvent: {}", event);
+                        rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE,
+                                        RegisterConstants.EVENT_PROFILE_FAILED,
+                                        event);
+                        log.info("Published ProfileFailedEvent: {}", event);
+                }
         }
-    }
 }

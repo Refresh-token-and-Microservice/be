@@ -3,6 +3,7 @@ package com.example.auth_service.listener;
 import com.example.auth_service.service.UserService;
 import com.example.common_dto.command.UpdateAuthEmailCommand;
 import com.example.common_dto.constant.RabbitMQConstants;
+import com.example.common_dto.constant.UpdateEmailConstants;
 import com.example.common_dto.event.AuthEmailUpdateFailedEvent;
 import com.example.common_dto.event.AuthEmailUpdatedEvent;
 
@@ -20,7 +21,7 @@ public class AuthEmailUpdateListener {
     private final UserService userService;
     private final RabbitTemplate rabbitTemplate;
 
-    @RabbitListener(queues = RabbitMQConstants.UPDATE_AUTH_EMAIL_QUEUE)
+    @RabbitListener(queues = UpdateEmailConstants.QUEUE_AUTH_EMAIL_UPDATE)
     public void handleUpdateAuthEmail(UpdateAuthEmailCommand command) {
         log.info("Received UpdateAuthEmailCommand for user: {}", command.getUserId());
         try {
@@ -31,7 +32,9 @@ public class AuthEmailUpdateListener {
                     .userId(command.getUserId())
                     .email(command.getNewEmail())
                     .build();
-            rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE, RabbitMQConstants.AUTH_EMAIL_UPDATED, event);
+            rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE,
+                    UpdateEmailConstants.EVENT_AUTH_EMAIL_UPDATED,
+                    event);
             log.info("Published AuthEmailUpdatedEvent for user: {}", command.getUserId());
 
         } catch (Exception e) {
@@ -41,7 +44,7 @@ public class AuthEmailUpdateListener {
                     .email(command.getNewEmail())
                     .reason(e.getMessage())
                     .build();
-            rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE, RabbitMQConstants.AUTH_EMAIL_UPDATE_FAILED,
+            rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE, UpdateEmailConstants.EVENT_AUTH_EMAIL_FAILED,
                     event);
         }
     }
