@@ -50,7 +50,7 @@ public class SagaOrchestrator {
      * Step 2a (SUCCESS): Listen for ProfileCreatedEvent from user-service
      * Then send ActivateUserCommand to auth-service
      */
-    @RabbitListener(queues = RegisterConstants.QUEUE_PROFILE_CREATE)
+    @RabbitListener(queues = RegisterConstants.QUEUE_ORCHESTRATOR_PROFILE_CREATED)
     public void handleProfileCreated(ProfileCreatedEvent event) {
         log.info("Received ProfileCreatedEvent: {}", event);
 

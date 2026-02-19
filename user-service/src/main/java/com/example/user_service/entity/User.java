@@ -1,5 +1,8 @@
 package com.example.user_service.entity;
 
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,6 +32,13 @@ public class User {
     private String phone;
     private String email;
     private String pendingEmail;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Builder.Default
+    private Boolean disabled = false;
+
+    @Column
+    private LocalDateTime disableAt;
 
     @Version
     @Builder.Default

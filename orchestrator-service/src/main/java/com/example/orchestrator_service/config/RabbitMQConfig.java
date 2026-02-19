@@ -8,6 +8,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.example.common_dto.constant.DisableUserConstants;
 import com.example.common_dto.constant.RabbitMQConstants;
 import com.example.common_dto.constant.RegisterConstants;
 import com.example.common_dto.constant.UpdateEmailConstants;
@@ -97,6 +98,30 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(authEmailUpdateFailedQueue())
                 .to(sagaExchange())
                 .with(UpdateEmailConstants.EVENT_AUTH_EMAIL_FAILED);
+    }
+
+    @Bean
+    public Queue disableUserRequestedQueue() {
+        return new Queue(DisableUserConstants.QUEUE_ORCHESTRATOR_DISABLE_USER_REQUESTED, true);
+    }
+
+    @Bean
+    public Binding disableUserRequestedBinding() {
+        return BindingBuilder.bind(disableUserRequestedQueue())
+                .to(sagaExchange())
+                .with(DisableUserConstants.EVENT_DISABLE_USER_REQUESTED);
+    }
+
+    @Bean
+    public Queue disableUserFailedQueue() {
+        return new Queue(DisableUserConstants.QUEUE_ORCHESTRATOR_DISABLE_USER, true);
+    }
+
+    @Bean
+    public Binding disableUserFailedBinding() {
+        return BindingBuilder.bind(disableUserFailedQueue())
+                .to(sagaExchange())
+                .with(DisableUserConstants.EVENT_DISABLE_USER);
     }
 
     @Bean

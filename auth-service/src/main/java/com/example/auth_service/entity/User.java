@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,16 +32,21 @@ public class User implements UserDetails {
 
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
     @Builder.Default
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
     @Column(nullable = false)
     @Builder.Default
-    private String status = "PENDING"; // PENDING or ACTIVE
+    private String status = "PENDING";
 
-    // --- CÁC HÀM CỦA USERDETAILS ---
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Builder.Default
+    private Boolean disabled = false;
+
+    @Column(nullable = true)
+    private LocalDateTime disableAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -76,6 +82,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return !disabled && "ACTIVE".equals(this.status);
     }
 }

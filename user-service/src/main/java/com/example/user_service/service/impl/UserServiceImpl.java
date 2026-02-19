@@ -6,9 +6,11 @@ import com.example.user_service.dto.UserDto;
 import com.example.user_service.entity.User;
 import com.example.user_service.repository.UserRepository;
 import com.example.user_service.service.UserService;
+import com.example.common_dto.constant.DisableUserConstants;
 import com.example.common_dto.constant.RabbitMQConstants;
 import com.example.common_dto.constant.UpdateEmailConstants;
 import com.example.common_dto.event.EmailUpdateRequestedEvent;
+import com.example.common_dto.event.UserDisableRequestEvent;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
@@ -83,7 +85,14 @@ public class UserServiceImpl implements UserService {
         public void deleteUser(String userId) {
                 User user = userRepository.findByUserId(userId)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
-                userRepository.delete(user);
+
+                if (user != null) {
+                        UserDisableRequestEvent event = UserDisableRequestEvent.builder()
+                                        .userId(userId)
+                                        .build();
+                        rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE,
+                                        DisableUserConstants.EVENT_DISABLE_USER_REQUESTED, event);
+                }
         }
 
         @Override

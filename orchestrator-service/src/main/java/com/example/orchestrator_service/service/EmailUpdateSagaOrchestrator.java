@@ -106,12 +106,10 @@ public class EmailUpdateSagaOrchestrator {
             sagaInstance.setStep(UpdateEmailSteps.AUTH_EMAIL_UPDATE_FAILED.name());
             sagaInstanceRepository.save(sagaInstance);
 
-            // Create command
             DiscardEmailUpdateCommand command = DiscardEmailUpdateCommand.builder()
                     .userId(event.getUserId())
                     .build();
 
-            // Send to User Service
             rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE,
                     UpdateEmailConstants.COMMAND_USER_EMAIL_DISCARD, command);
         } else {

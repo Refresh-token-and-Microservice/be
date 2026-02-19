@@ -8,6 +8,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.example.common_dto.constant.DisableUserConstants;
 import com.example.common_dto.constant.RabbitMQConstants;
 import com.example.common_dto.constant.RegisterConstants;
 import com.example.common_dto.constant.UpdateEmailConstants;
@@ -54,6 +55,18 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(discardEmailUpdateQueue())
                 .to(sagaExchange())
                 .with(UpdateEmailConstants.COMMAND_USER_EMAIL_DISCARD);
+    }
+
+    @Bean
+    public Queue disableUserConfirmQueue() {
+        return new Queue(DisableUserConstants.QUEUE_USER_DISABLE_USER_CONFIRM, true);
+    }
+
+    @Bean
+    public Binding disableUserConfirmBinding() {
+        return BindingBuilder.bind(disableUserConfirmQueue())
+                .to(sagaExchange())
+                .with(DisableUserConstants.COMMAND_DISABLE_USER_CONFIRM);
     }
 
     @SuppressWarnings("removal")

@@ -7,6 +7,8 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.example.common_dto.constant.DisableUserConstants;
 import com.example.common_dto.constant.RabbitMQConstants;
 import com.example.common_dto.constant.RegisterConstants;
 import com.example.common_dto.constant.UpdateEmailConstants;;
@@ -53,6 +55,18 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(updateAuthEmailQueue())
                 .to(sagaExchange())
                 .with(UpdateEmailConstants.COMMAND_AUTH_EMAIL_UPDATE);
+    }
+
+    @Bean
+    public Queue authUserDisableQueue() {
+        return new Queue(DisableUserConstants.QUEUE_AUTH_DISABLE_USER, true);
+    }
+
+    @Bean
+    public Binding authUserDisableBinding() {
+        return BindingBuilder.bind(authUserDisableQueue())
+                .to(sagaExchange())
+                .with(DisableUserConstants.COMMAND_DISABLE_USER);
     }
 
     @SuppressWarnings("removal")
