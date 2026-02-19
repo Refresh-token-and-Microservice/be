@@ -7,7 +7,9 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.example.common_dto.constant.RabbitMQConstants;;
+import com.example.common_dto.constant.RabbitMQConstants;
+import com.example.common_dto.constant.RegisterConstants;
+import com.example.common_dto.constant.UpdateEmailConstants;;
 
 @Configuration
 public class RabbitMQConfig {
@@ -19,40 +21,41 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue userActivateQueue() {
-        return new Queue(RabbitMQConstants.USER_ACTIVATE_QUEUE, true);
+        return new Queue(RegisterConstants.QUEUE_USER_ACTIVATE, true);
     }
 
     @Bean
     public Queue authRollbackQueue() {
-        return new Queue(RabbitMQConstants.AUTH_ROLLBACK_QUEUE, true);
+        return new Queue(RegisterConstants.QUEUE_AUTH_ROLLBACK, true);
     }
 
     @Bean
     public Binding userActivateBinding() {
         return BindingBuilder.bind(userActivateQueue())
                 .to(sagaExchange())
-                .with(RabbitMQConstants.ORCHESTRATOR_USER_ACTIVATE);
+                .with(RegisterConstants.COMMAND_USER_ACTIVATE);
     }
 
     @Bean
     public Binding authRollbackBinding() {
         return BindingBuilder.bind(authRollbackQueue())
                 .to(sagaExchange())
-                .with(RabbitMQConstants.ORCHESTRATOR_AUTH_ROLLBACK);
+                .with(RegisterConstants.COMMAND_AUTH_ROLLBACK);
     }
 
     @Bean
     public Queue updateAuthEmailQueue() {
-        return new Queue(RabbitMQConstants.UPDATE_AUTH_EMAIL_QUEUE, true);
+        return new Queue(UpdateEmailConstants.QUEUE_AUTH_EMAIL_UPDATE, true);
     }
 
     @Bean
     public Binding updateAuthEmailBinding() {
         return BindingBuilder.bind(updateAuthEmailQueue())
                 .to(sagaExchange())
-                .with(RabbitMQConstants.ORCHESTRATOR_AUTH_EMAIL_UPDATE);
+                .with(UpdateEmailConstants.COMMAND_AUTH_EMAIL_UPDATE);
     }
 
+    @SuppressWarnings("removal")
     @Bean
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();

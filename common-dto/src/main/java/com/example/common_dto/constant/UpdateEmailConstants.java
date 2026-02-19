@@ -3,24 +3,24 @@ package com.example.common_dto.constant;
 public class UpdateEmailConstants {
 
     // User Service báo cáo: "Có người dùng muốn đổi email" (Event)
-    public static final String ROUTING_KEY_EMAIL_UPDATE_REQUESTED = "email.update-requested.event";
+    public static final String EVENT_EMAIL_UPDATE_REQUESTED = "email.update-requested.event";
 
     // Orchestrator ra lệnh: "Auth Service, đổi email đi" (Command)
-    public static final String ROUTING_KEY_AUTH_EMAIL_UPDATE = "auth.email.update.command";
+    public static final String COMMAND_AUTH_EMAIL_UPDATE = "auth.email.update.command";
 
     // Auth Service báo cáo: "Tôi đã đổi email thành công" (Event)
-    public static final String ROUTING_KEY_AUTH_EMAIL_UPDATED = "auth.email.updated.event";
+    public static final String EVENT_AUTH_EMAIL_UPDATED = "auth.email.updated.event";
 
     // Auth Service báo cáo: "Tôi đổi email THẤT BẠI rồi" (Event) - Bổ sung cho đủ
     // luồng
-    public static final String ROUTING_KEY_AUTH_EMAIL_FAILED = "auth.email.failed.event";
+    public static final String EVENT_AUTH_EMAIL_FAILED = "auth.email.failed.event";
 
     // Orchestrator ra lệnh: "User Service, chốt đổi email đi" (Command)
-    public static final String ROUTING_KEY_USER_EMAIL_CONFIRM = "user.email.confirm.command";
+    public static final String COMMAND_USER_EMAIL_CONFIRM = "user.email.confirm.command";
 
     // Orchestrator ra lệnh: "User Service, huỷ lệnh đổi email đi" (Command) - Bổ
     // sung
-    public static final String ROUTING_KEY_USER_EMAIL_DISCARD = "user.email.discard.command";
+    public static final String COMMAND_USER_EMAIL_DISCARD = "user.email.discard.command";
 
     // =========================================================
     // 2. QUEUES (Hàng đợi - Dùng trong @RabbitListener)

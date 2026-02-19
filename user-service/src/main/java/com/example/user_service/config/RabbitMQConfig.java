@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.example.common_dto.constant.RabbitMQConstants;
+import com.example.common_dto.constant.RegisterConstants;
+import com.example.common_dto.constant.UpdateEmailConstants;
 
 @Configuration
 public class RabbitMQConfig {
@@ -20,40 +22,41 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue profileCreateQueue() {
-        return new Queue(RabbitMQConstants.PROFILE_CREATE_QUEUE, true);
+        return new Queue(RegisterConstants.QUEUE_PROFILE_CREATE, true);
     }
 
     @Bean
     public Binding profileCreateBinding() {
         return BindingBuilder.bind(profileCreateQueue())
                 .to(sagaExchange())
-                .with(RabbitMQConstants.ORCHESTRATOR_PROFILE_CREATE);
+                .with(RegisterConstants.COMMAND_PROFILE_CREATE);
     }
 
     @Bean
     public Queue confirmEmailUpdateQueue() {
-        return new Queue(RabbitMQConstants.CONFIRM_EMAIL_UPDATE_QUEUE, true);
+        return new Queue(UpdateEmailConstants.QUEUE_USER_EMAIL_CONFIRM, true);
     }
 
     @Bean
     public Queue discardEmailUpdateQueue() {
-        return new Queue(RabbitMQConstants.DISCARD_EMAIL_UPDATE_QUEUE, true);
+        return new Queue(UpdateEmailConstants.QUEUE_USER_EMAIL_DISCARD, true);
     }
 
     @Bean
     public Binding confirmEmailUpdateBinding() {
         return BindingBuilder.bind(confirmEmailUpdateQueue())
                 .to(sagaExchange())
-                .with(RabbitMQConstants.ORCHESTRATOR_USER_CONFIRM_EMAIL);
+                .with(UpdateEmailConstants.COMMAND_USER_EMAIL_CONFIRM);
     }
 
     @Bean
     public Binding discardEmailUpdateBinding() {
         return BindingBuilder.bind(discardEmailUpdateQueue())
                 .to(sagaExchange())
-                .with(RabbitMQConstants.ORCHESTRATOR_USER_DISCARD_EMAIL);
+                .with(UpdateEmailConstants.COMMAND_USER_EMAIL_DISCARD);
     }
 
+    @SuppressWarnings("removal")
     @Bean
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();

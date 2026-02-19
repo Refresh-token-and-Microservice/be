@@ -3,7 +3,7 @@ package com.example.auth_service.listener;
 import com.example.auth_service.entity.User;
 import com.example.auth_service.repository.UserRepository;
 import com.example.common_dto.command.ActivateUserCommand;
-import com.example.common_dto.constant.RabbitMQConstants;
+import com.example.common_dto.constant.RegisterConstants;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ public class UserActivationListener {
 
     private final UserRepository userRepository;
 
-    @RabbitListener(queues = RabbitMQConstants.USER_ACTIVATE_QUEUE)
+    @RabbitListener(queues = RegisterConstants.QUEUE_USER_ACTIVATE)
     @Transactional
     public void handleActivateUser(ActivateUserCommand command) {
         log.info("Received ActivateUserCommand: {}", command);

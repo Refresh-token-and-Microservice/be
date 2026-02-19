@@ -4,15 +4,21 @@ import com.example.common_dto.command.ConfirmEmailUpdateCommand;
 import com.example.common_dto.command.DiscardEmailUpdateCommand;
 import com.example.common_dto.command.UpdateAuthEmailCommand;
 import com.example.common_dto.constant.RabbitMQConstants;
+import com.example.common_dto.constant.UpdateEmailConstants;
 import com.example.common_dto.event.AuthEmailUpdateFailedEvent;
 import com.example.common_dto.event.AuthEmailUpdatedEvent;
 import com.example.common_dto.event.EmailUpdateRequestedEvent;
 import com.example.orchestrator_service.entity.SagaInstance;
+import com.example.orchestrator_service.enums.Status;
+import com.example.orchestrator_service.enums.UpdateEmailSteps;
 import com.example.orchestrator_service.repository.SagaInstanceRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.UUID;
+
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -27,32 +33,32 @@ public class EmailUpdateSagaOrchestrator {
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
 
-    @RabbitListener(queues = RabbitMQConstants.EMAIL_UPDATE_REQUESTED_QUEUE)
+    @RabbitListener(queues = UpdateEmailConstants.QUEUE_ORCHESTRATOR_EMAIL_UPDATE_REQUESTED)
     @Transactional
     public void handleEmailUpdateRequested(EmailUpdateRequestedEvent event) {
         log.info("Received EmailUpdateRequestedEvent for user: {}", event.getUserId());
+
+        String transactionId = UUID.randomUUID().toString();
 
         try {
             // Persist State: STARTED
             SagaInstance sagaInstance = SagaInstance.builder()
                     .userId(event.getUserId())
-                    .transactionId(event.getUserId()) // Using userId as transactionId for simplicity in this flow
-                                                      // basically
+                    .transactionId(transactionId)
                     .payload(objectMapper.writeValueAsString(event))
-                    .status("STARTED")
-                    .step("EMAIL_UPDATE_REQUESTED")
+                    .status(Status.STARTED)
+                    .step(UpdateEmailSteps.EMAIL_UPDATE_REQUESTED.name())
                     .build();
             sagaInstanceRepository.save(sagaInstance);
 
-            // Create command
             UpdateAuthEmailCommand command = UpdateAuthEmailCommand.builder()
+                    .transactionId(transactionId)
                     .userId(event.getUserId())
                     .newEmail(event.getNewEmail())
                     .build();
 
-            // Send to Auth Service
             rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE,
-                    RabbitMQConstants.ORCHESTRATOR_AUTH_EMAIL_UPDATE, command);
+                    UpdateEmailConstants.COMMAND_AUTH_EMAIL_UPDATE, command);
 
         } catch (JsonProcessingException e) {
             log.error("Error serializing event payload", e);
@@ -60,50 +66,44 @@ public class EmailUpdateSagaOrchestrator {
         }
     }
 
-    @RabbitListener(queues = RabbitMQConstants.AUTH_EMAIL_UPDATED_QUEUE)
+    @RabbitListener(queues = UpdateEmailConstants.QUEUE_ORCHESTRATOR_AUTH_EMAIL_UPDATED)
     @Transactional
     public void handleAuthEmailUpdated(AuthEmailUpdatedEvent event) {
         log.info("Received AuthEmailUpdatedEvent for user: {}", event.getUserId());
 
-        SagaInstance sagaInstance = sagaInstanceRepository.findByUserIdAndStatus(event.getUserId(), "STARTED")
-                .orElse(null); // Should find by transactionId if possible, but userId works if 1 active saga
-                               // per user
+        SagaInstance sagaInstance = sagaInstanceRepository.findByTransactionId(event.getTransactionId()).orElse(null);
 
         if (sagaInstance != null) {
-            sagaInstance.setStatus("AUTH_UPDATED");
-            sagaInstance.setStep("AUTH_EMAIL_UPDATED");
+            sagaInstance.setStatus(Status.PROCESSING);
+            sagaInstance.setStep(UpdateEmailSteps.AUTH_EMAIL_UPDATED.name());
             sagaInstanceRepository.save(sagaInstance);
 
-            // Create command
             ConfirmEmailUpdateCommand command = ConfirmEmailUpdateCommand.builder()
                     .userId(event.getUserId())
                     .email(event.getEmail())
                     .build();
 
-            // Send to User Service
             rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE,
-                    RabbitMQConstants.ORCHESTRATOR_USER_CONFIRM_EMAIL, command);
+                    UpdateEmailConstants.COMMAND_USER_EMAIL_CONFIRM, command);
 
-            // Mark as COMPLETED after sending command (optimistic)
-            sagaInstance.setStatus("COMPLETED");
-            sagaInstance.setStep("COMPLETED");
+            sagaInstance.setStatus(Status.COMPLETED);
+            sagaInstance.setStep(UpdateEmailSteps.CONFIRM_EMAIL_UPDATE.name());
             sagaInstanceRepository.save(sagaInstance);
         } else {
             log.warn("Saga instance not found for userId: {}", event.getUserId());
         }
     }
 
-    @RabbitListener(queues = RabbitMQConstants.AUTH_EMAIL_UPDATE_FAILED_QUEUE)
+    @RabbitListener(queues = UpdateEmailConstants.QUEUE_ORCHESTRATOR_AUTH_EMAIL_FAILED)
     @Transactional
     public void handleAuthEmailUpdateFailed(AuthEmailUpdateFailedEvent event) {
         log.info("Received AuthEmailUpdateFailedEvent for user: {}", event.getUserId());
 
-        SagaInstance sagaInstance = sagaInstanceRepository.findByUserIdAndStatus(event.getUserId(), "STARTED")
-                .orElse(null);
+        SagaInstance sagaInstance = sagaInstanceRepository.findByTransactionId(event.getTransactionId()).orElse(null);
 
         if (sagaInstance != null) {
-            sagaInstance.setStatus("FAILED");
-            sagaInstance.setStep("AUTH_EMAIL_UPDATE_FAILED");
+            sagaInstance.setStatus(Status.FAILED);
+            sagaInstance.setStep(UpdateEmailSteps.AUTH_EMAIL_UPDATE_FAILED.name());
             sagaInstanceRepository.save(sagaInstance);
 
             // Create command
@@ -113,7 +113,7 @@ public class EmailUpdateSagaOrchestrator {
 
             // Send to User Service
             rabbitTemplate.convertAndSend(RabbitMQConstants.SAGA_EXCHANGE,
-                    RabbitMQConstants.ORCHESTRATOR_USER_DISCARD_EMAIL, command);
+                    UpdateEmailConstants.COMMAND_USER_EMAIL_DISCARD, command);
         } else {
             log.warn("Saga instance not found for userId: {}", event.getUserId());
         }

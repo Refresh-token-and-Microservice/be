@@ -81,6 +81,7 @@ public class SecurityConfig {
         return RoleHierarchyImpl.fromHierarchy("ADMIN > EMPLOYEE");
     }
 
+    @SuppressWarnings("deprecation")
     @Bean
     public MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
         DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();

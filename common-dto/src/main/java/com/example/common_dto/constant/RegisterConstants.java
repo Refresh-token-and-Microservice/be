@@ -9,23 +9,23 @@ public class RegisterConstants {
 
     // -- EVENTS (Sự kiện đã xảy ra trong quá khứ) --
     // Auth Service thông báo: "Có user mới vừa đăng ký"
-    public static final String ROUTING_KEY_AUTH_USER_REGISTERED = "auth.user.registered.event";
+    public static final String EVENT_AUTH_USER_REGISTERED = "auth.user.registered.event";
 
     // Profile Service thông báo: "Đã tạo profile thành công"
-    public static final String ROUTING_KEY_PROFILE_CREATED = "profile.created.event";
+    public static final String EVENT_PROFILE_CREATED = "profile.created.event";
 
     // Profile Service thông báo: "Tạo profile THẤT BẠI"
-    public static final String ROUTING_KEY_PROFILE_FAILED = "profile.failed.event";
+    public static final String EVENT_PROFILE_FAILED = "profile.failed.event";
 
     // -- COMMANDS (Mệnh lệnh yêu cầu thực thi) --
     // Orchestrator ra lệnh: "Profile Service, hãy tạo profile đi"
-    public static final String ROUTING_KEY_PROFILE_CREATE = "profile.create.command";
+    public static final String COMMAND_PROFILE_CREATE = "profile.create.command";
 
     // Orchestrator ra lệnh: "User Service, hãy kích hoạt user này đi"
-    public static final String ROUTING_KEY_USER_ACTIVATE = "user.activate.command";
+    public static final String COMMAND_USER_ACTIVATE = "user.activate.command";
 
     // Orchestrator ra lệnh: "Auth Service, hãy rollback (xóa/disable) user này đi"
-    public static final String ROUTING_KEY_AUTH_ROLLBACK = "auth.rollback.command";
+    public static final String COMMAND_AUTH_ROLLBACK = "auth.rollback.command";
 
     // =========================================================
     // 2. QUEUES (Hàng đợi - Dùng trong @RabbitListener)
