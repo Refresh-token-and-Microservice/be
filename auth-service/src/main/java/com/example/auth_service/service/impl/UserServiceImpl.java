@@ -79,6 +79,9 @@ public class UserServiceImpl implements UserService {
         Optional<User> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPassword())) {
+            if (!userOpt.get().isEnabled()) {
+                return Optional.empty();
+            }
             return Optional.of(userMapper.toResponse(userOpt.get()));
         }
 
