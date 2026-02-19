@@ -4,11 +4,15 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,6 +35,7 @@ public class User implements UserDetails {
 
     private String password;
 
+    @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER)
     @Builder.Default
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -38,7 +43,14 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     @Builder.Default
-    private String status = "PENDING"; // PENDING or ACTIVE
+    private String status = "PENDING";
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isDisabled = false;
+
+    @Column(nullable = true)
+    private LocalDateTime disableAt;
 
     // --- CÁC HÀM CỦA USERDETAILS ---
 
@@ -76,6 +88,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return !isDisabled && "ACTIVE".equals(this.status);
     }
 }

@@ -57,6 +57,18 @@ public class RabbitMQConfig {
 
     @SuppressWarnings("removal")
     @Bean
+    public Queue authUserDisableQueue() {
+        return new Queue(RabbitMQConstants.AUTH_USER_DISABLED_QUEUE, true);
+    }
+
+    @Bean
+    public Binding authUserDisableBinding() {
+        return BindingBuilder.bind(authUserDisableQueue())
+                .to(sagaExchange())
+                .with(RabbitMQConstants.ORCHESTRATOR_AUTH_USER_DISABLE);
+    }
+
+    @Bean
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
