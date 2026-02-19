@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UpdateAuthEmailCommand {
+    private String transactionId;
     private String userId;
     private String newEmail;
 }
