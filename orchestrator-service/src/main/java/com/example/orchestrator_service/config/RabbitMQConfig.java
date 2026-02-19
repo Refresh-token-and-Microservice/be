@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.example.common_dto.constant.RabbitMQConstants;
+import com.example.common_dto.constant.RegisterConstants;
 
 @Configuration
 public class RabbitMQConfig {
@@ -20,38 +21,38 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue authRegisteredQueue() {
-        return new Queue(RabbitMQConstants.AUTH_REGISTERED_QUEUE, true);
+        return new Queue(RegisterConstants.AUTH_REGISTERED_QUEUE, true);
     }
 
     @Bean
     public Queue profileCreatedQueue() {
-        return new Queue(RabbitMQConstants.PROFILE_CREATED_QUEUE, true);
+        return new Queue(RegisterConstants.PROFILE_CREATED_QUEUE, true);
     }
 
     @Bean
     public Queue profileFailedQueue() {
-        return new Queue(RabbitMQConstants.PROFILE_FAILED_QUEUE, true);
+        return new Queue(RegisterConstants.PROFILE_FAILED_QUEUE, true);
     }
 
     @Bean
     public Binding authRegisteredBinding() {
         return BindingBuilder.bind(authRegisteredQueue())
                 .to(sagaExchange())
-                .with(RabbitMQConstants.AUTH_USER_REGISTERED);
+                .with(RegisterConstants.AUTH_USER_REGISTERED);
     }
 
     @Bean
     public Binding profileCreatedBinding() {
         return BindingBuilder.bind(profileCreatedQueue())
                 .to(sagaExchange())
-                .with(RabbitMQConstants.USER_PROFILE_CREATED);
+                .with(RegisterConstants.USER_PROFILE_CREATED);
     }
 
     @Bean
     public Binding profileFailedBinding() {
         return BindingBuilder.bind(profileFailedQueue())
                 .to(sagaExchange())
-                .with(RabbitMQConstants.USER_PROFILE_FAILED);
+                .with(RegisterConstants.USER_PROFILE_FAILED);
     }
 
     @Bean

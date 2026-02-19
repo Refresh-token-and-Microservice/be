@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.example.orchestrator_service.enums.Status;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,14 +24,14 @@ public class SagaInstance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String transactionId; // Can be userId for this saga
+    private String transactionId;
     private String userId;
 
     @Column(columnDefinition = "TEXT")
-    private String payload; // JSON string
+    private String payload;
 
-    private String status; // STARTED, AUTH_UPDATED, COMPLETED, FAILED
-    private String step; // CURRENT_STEP
+    private Status status;
+    private String step;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
