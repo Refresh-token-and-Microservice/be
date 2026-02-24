@@ -21,6 +21,7 @@
 		<module>auth-service</module>
 		<module>orchestrator-service</module>
 		<module>common-dto</module>
+		<module>event-service</module>
 	</modules>
 
 	<properties>
