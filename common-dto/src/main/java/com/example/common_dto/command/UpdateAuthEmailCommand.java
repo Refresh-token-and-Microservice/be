@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UpdateAuthEmailCommand {
     private String transactionId;
-    private String userId;
+    private Integer userId;
     private String newEmail;
 }

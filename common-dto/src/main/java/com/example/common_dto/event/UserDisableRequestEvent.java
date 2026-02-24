@@ -14,5 +14,5 @@ import java.io.Serializable;
 public class UserDisableRequestEvent implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String userId;
+    private Integer userId;
 }

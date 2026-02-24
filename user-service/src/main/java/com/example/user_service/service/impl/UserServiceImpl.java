@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
         }
 
         @Override
-        public UserDto getUserById(String userId) {
+        public UserDto getUserById(Integer userId) {
                 User user = userRepository.findByUserId(userId)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
                 return userMapper.toDto(user);
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
         }
 
         @Override
-        public UserDto updateUser(String userId, UserDto userDto) {
+        public UserDto updateUser(Integer userId, UserDto userDto) {
                 User user = userRepository.findByUserId(userId)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
         }
 
         @Override
-        public void deleteUser(String userId) {
+        public void deleteUser(Integer userId) {
                 User user = userRepository.findByUserId(userId)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
         }
 
         @Override
-        public void confirmEmailUpdate(String userId, String email) {
+        public void confirmEmailUpdate(Integer userId, String email) {
                 User user = userRepository.findByUserId(userId)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
                 if (email.equals(user.getPendingEmail())) {
@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
         }
 
         @Override
-        public void discardEmailUpdate(String userId) {
+        public void discardEmailUpdate(Integer userId) {
                 User user = userRepository.findByUserId(userId)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
                 user.setPendingEmail(null);

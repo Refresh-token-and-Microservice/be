@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class DiscardEmailUpdateCommand {
-    private String userId;
+    private Integer userId;
 }

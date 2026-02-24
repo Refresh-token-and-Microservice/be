@@ -26,7 +26,7 @@ public class UserController {
 
     @GetMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal")
-    public ResponseEntity<ApiResponse<UserDto>> getUser(@PathVariable String userId) {
+    public ResponseEntity<ApiResponse<UserDto>> getUser(@PathVariable Integer userId) {
         return ResponseFactory.success("User retrieved successfully", userService.getUserById(userId));
     }
 
@@ -38,13 +38,13 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal")
-    public ResponseEntity<ApiResponse<UserDto>> updateUser(@PathVariable String userId, @RequestBody UserDto userDto) {
+    public ResponseEntity<ApiResponse<UserDto>> updateUser(@PathVariable Integer userId, @RequestBody UserDto userDto) {
         return ResponseFactory.success("User updated successfully", userService.updateUser(userId, userDto));
     }
 
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable String userId) {
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Integer userId) {
         userService.deleteUser(userId);
         return ResponseFactory.success("User deleted successfully", null);
     }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class EmailUpdateRequestedEvent {
-    private String userId;
+    private Integer userId;
     private String oldEmail;
     private String newEmail;
 }

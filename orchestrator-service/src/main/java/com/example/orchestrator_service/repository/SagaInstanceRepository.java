@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface SagaInstanceRepository extends JpaRepository<SagaInstance, Long> {
-    Optional<SagaInstance> findByUserIdAndStatus(String userId, Status status);
+    Optional<SagaInstance> findByUserIdAndStatus(Integer userId, Status status);
 
     Optional<SagaInstance> findByTransactionId(String transactionId);
 }

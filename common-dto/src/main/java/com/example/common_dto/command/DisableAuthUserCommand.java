@@ -16,5 +16,5 @@ public class DisableAuthUserCommand implements Serializable {
 
     private String transactionId;
 
-    private String userId;
+    private Integer userId;
 }
