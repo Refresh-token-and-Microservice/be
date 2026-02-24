@@ -31,6 +31,13 @@ spring:
             filters:
               - AuthenticationFilter
 
+          - id: event-service
+            uri: lb://EVENT-SERVICE
+            predicates:
+              - Path=/events/**
+            filters:
+              - AuthenticationFilter
+
 eureka:
   client:
     service-url:

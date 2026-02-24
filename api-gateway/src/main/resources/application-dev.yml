@@ -18,3 +18,17 @@ spring:
               - Path=/api/**
             filters:
               - AuthenticationFilter
+
+          - id: user-service
+            uri: lb://USER-SERVICE
+            predicates:
+              - Path=/user/**
+            filters:
+              - AuthenticationFilter
+
+          - id: event-service
+            uri: lb://EVENT-SERVICE
+            predicates:
+              - Path=/events/**
+            filters:
+              - AuthenticationFilter

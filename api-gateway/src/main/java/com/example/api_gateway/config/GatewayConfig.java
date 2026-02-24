@@ -28,6 +28,11 @@ public class GatewayConfig {
                         .route(RequestPredicates.path("/user/**"), http())
                         .filter(authenticationFilter)
                         .filter(lb("USER-SERVICE"))
+                        .build())
+                .and(route("event-service")
+                        .route(RequestPredicates.path("/events/**"), http())
+                        .filter(authenticationFilter)
+                        .filter(lb("EVENT-SERVICE"))
                         .build());
     }
 }
