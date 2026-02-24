@@ -7,15 +7,15 @@ import java.util.List;
 public interface UserService {
     UserDto saveUser(UserDto userDto);
 
-    UserDto getUserById(String userId);
+    UserDto getUserById(Integer userId);
 
     List<UserDto> getAllUsers();
 
-    UserDto updateUser(String userId, UserDto userDto);
+    UserDto updateUser(Integer userId, UserDto userDto);
 
-    void deleteUser(String userId);
+    void deleteUser(Integer userId);
 
-    void confirmEmailUpdate(String userId, String email);
+    void confirmEmailUpdate(Integer userId, String email);
 
-    void discardEmailUpdate(String userId);
+    void discardEmailUpdate(Integer userId);
 }

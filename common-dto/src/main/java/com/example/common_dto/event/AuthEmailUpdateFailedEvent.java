@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AuthEmailUpdateFailedEvent {
     private String transactionId;
-    private String userId;
+    private Integer userId;
     private String email;
     private String reason;
 }

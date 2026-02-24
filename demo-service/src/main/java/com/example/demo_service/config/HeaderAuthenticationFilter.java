@@ -21,7 +21,7 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String userEmail = request.getHeader("X-User-Email");
-        String userId = request.getHeader("X-User-Id");
+        Integer userId = Integer.valueOf(request.getHeader("X-User-Id"));
         String rolesString = request.getHeader("X-User-Roles");
 
         if (userEmail != null && rolesString != null) {

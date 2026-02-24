@@ -29,7 +29,7 @@ public class ProfileCreationListener {
 
                 try {
                         User user = User.builder()
-                                        .userId(String.valueOf(command.getUserId()))
+                                        .userId(command.getUserId())
                                         .email(command.getEmail())
                                         .build();
 

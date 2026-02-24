@@ -25,7 +25,7 @@ public class SagaInstance {
     private Long id;
 
     private String transactionId;
-    private String userId;
+    private Integer userId;
 
     @Column(columnDefinition = "TEXT")
     private String payload;

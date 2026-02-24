@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ConfirmEmailUpdateCommand {
-    private String userId;
+    private Integer userId;
     private String email;
 }

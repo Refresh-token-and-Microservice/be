@@ -36,7 +36,7 @@ public class DisableUserSagaOrchestrator {
         SagaInstance sagaInstance = SagaInstance.builder()
                 .userId(event.getUserId())
                 .transactionId(transactionId)
-                .payload(event.getUserId())
+                .payload(String.valueOf(event.getUserId()))
                 .status(Status.STARTED)
                 .step(DisableUserSteps.DISABLE_USER_REQUESTED.name())
                 .build();
