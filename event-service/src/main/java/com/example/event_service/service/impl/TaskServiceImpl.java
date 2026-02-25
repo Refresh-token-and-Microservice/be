@@ -35,13 +35,15 @@ public class TaskServiceImpl implements TaskService {
     public TaskResponse createTask(String eventId, TaskCreateRequest request, Integer requesterId) {
         Event event = checkHasEditorOrOwnerPermission(eventId, requesterId);
 
+        validateAssignee(eventId, request.getAssigneeId(), event);
+
         Task task = Task.builder()
                 .event(event)
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .assigneeId(request.getAssigneeId())
                 .dueDate(request.getDueDate())
-                .status(TaskStatus.OPEN)
+                .status(request.getAssigneeId() != null ? TaskStatus.PENDING : TaskStatus.OPEN)
                 .isLate(false)
                 .build();
 
@@ -90,15 +92,10 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findByIdAndEventId(taskId, eventId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
-        // Optionally check if assignee is a member of the event
-        if (request.getAssigneeId() != null) {
-            boolean isMember = eventMemberRepository.existsByEventIdAndUserId(eventId, request.getAssigneeId());
-            if (!isMember && !eventRepository.findById(eventId).get().getOwnerId().equals(request.getAssigneeId())) {
-                throw new RuntimeException("Assignee must be a member of the event");
-            }
-        }
+        validateAssignee(eventId, request.getAssigneeId(), task.getEvent());
 
         task.setAssigneeId(request.getAssigneeId());
+        task.setStatus(request.getAssigneeId() != null ? TaskStatus.PENDING : TaskStatus.OPEN);
         task = taskRepository.save(task);
         return mapToResponse(task);
     }
@@ -149,6 +146,38 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
         taskRepository.delete(task);
+    }
+
+    @Override
+    @Transactional
+    public TaskResponse acceptTask(String eventId, Long taskId, Integer requesterId) {
+        Task task = taskRepository.findByIdAndEventId(taskId, eventId)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        if (!requesterId.equals(task.getAssigneeId())) {
+            throw new RuntimeException("Access denied: Only the assigned user can accept this task");
+        }
+
+        if (task.getStatus() != TaskStatus.PENDING) {
+            throw new RuntimeException("Action blocked: Task is not in PENDING status");
+        }
+
+        task.setStatus(TaskStatus.PROCESSING);
+        task = taskRepository.save(task);
+        return mapToResponse(task);
+    }
+
+    private void validateAssignee(String eventId, Integer assigneeId, Event event) {
+        if (assigneeId != null) {
+            if (event.getOwnerId().equals(assigneeId)) {
+                return;
+            }
+            boolean isEditor = eventMemberRepository.existsByEventIdAndUserIdAndRole(eventId, assigneeId,
+                    EventRole.EDITOR);
+            if (!isEditor) {
+                throw new RuntimeException("Assignee must be an OWNER or EDITOR of the event");
+            }
+        }
     }
 
     private Event checkHasEditorOrOwnerPermission(String eventId, Integer userId) {

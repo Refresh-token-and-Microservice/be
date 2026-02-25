@@ -19,5 +19,7 @@ public interface TaskService {
 
     TaskResponse updateTaskStatus(String eventId, Long taskId, TaskStatusUpdateRequest request, Integer requesterId);
 
+    TaskResponse acceptTask(String eventId, Long taskId, Integer requesterId);
+
     void deleteTask(String eventId, Long taskId, Integer requesterId);
 }

@@ -56,6 +56,13 @@ public class TaskController {
         return ResponseEntity.ok(taskService.updateTaskStatus(eventId, taskId, request, getUserId()));
     }
 
+    @PatchMapping("/{taskId}/accept")
+    public ResponseEntity<TaskResponse> acceptTask(
+            @PathVariable String eventId,
+            @PathVariable Long taskId) {
+        return ResponseEntity.ok(taskService.acceptTask(eventId, taskId, getUserId()));
+    }
+
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> deleteTask(
             @PathVariable String eventId,

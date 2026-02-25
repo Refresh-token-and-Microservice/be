@@ -6,9 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.example.event_service.enums.TaskStatus;
 
 @Entity
@@ -17,7 +14,6 @@ import com.example.event_service.enums.TaskStatus;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,13 +32,22 @@ public class Task {
     private Integer assigneeId;
     private Instant dueDate;
 
-    @CreatedDate
     @Column(updatable = false)
     private Instant createdAt;
 
-    @LastModifiedDate
     private Instant updatedAt;
 
     @Builder.Default
     private Boolean isLate = false;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = Instant.now();
+    }
 }
