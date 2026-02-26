@@ -32,3 +32,10 @@ spring:
               - Path=/events/**
             filters:
               - AuthenticationFilter
+
+          - id: member-service
+            uri: lb://MEMBER-SERVICE
+            predicates:
+              - Path=/members/**
+            filters:
+              - AuthenticationFilter

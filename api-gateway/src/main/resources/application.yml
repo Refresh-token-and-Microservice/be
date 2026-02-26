@@ -38,6 +38,13 @@ spring:
             filters:
               - AuthenticationFilter
 
+          - id: member-service
+            uri: lb://MEMBER-SERVICE
+            predicates:
+              - Path=/members/**
+            filters:
+              - AuthenticationFilter
+
 eureka:
   client:
     service-url:

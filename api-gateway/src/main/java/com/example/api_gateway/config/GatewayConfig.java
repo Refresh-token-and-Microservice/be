@@ -33,6 +33,11 @@ public class GatewayConfig {
                         .route(RequestPredicates.path("/events/**"), http())
                         .filter(authenticationFilter)
                         .filter(lb("EVENT-SERVICE"))
+                        .build())
+                .and(route("member-service")
+                        .route(RequestPredicates.path("/members/**"), http())
+                        .filter(authenticationFilter)
+                        .filter(lb("MEMBER-SERVICE"))
                         .build());
     }
 }
