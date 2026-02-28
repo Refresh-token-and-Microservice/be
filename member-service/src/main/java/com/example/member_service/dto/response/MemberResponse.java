@@ -1,6 +1,7 @@
-package com.example.event_service.dto.response;
+package com.example.member_service.dto.response;
 
-import com.example.event_service.enums.EventRole;
+import com.example.member_service.enums.EventRole;
+import com.example.member_service.enums.MemberStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +18,6 @@ public class MemberResponse {
     private String eventId;
     private Integer userId;
     private EventRole role;
+    private MemberStatus status;
     private Instant joinedAt;
 }

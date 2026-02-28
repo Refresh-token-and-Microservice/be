@@ -1,6 +1,6 @@
-package com.example.event_service.dto.request;
+package com.example.member_service.dto.request;
 
-import com.example.event_service.enums.EventRole;
+import com.example.member_service.enums.EventRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MemberInviteRequest {
     private Integer userId;
-    private EventRole role;
+    private EventRole role; // Expected: EDITOR or VIEWER
 }

@@ -33,6 +33,11 @@ public class EventController {
         return ResponseEntity.ok(eventService.getEvent(eventId, getUserId()));
     }
 
+    @GetMapping("/{eventId}/internal")
+    public ResponseEntity<EventResponse> getEventInternal(@PathVariable String eventId) {
+        return ResponseEntity.ok(eventService.getEventInternal(eventId));
+    }
+
     @PutMapping("/{eventId}")
     public ResponseEntity<EventResponse> updateEvent(
             @PathVariable String eventId,

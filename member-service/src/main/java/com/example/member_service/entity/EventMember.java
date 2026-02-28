@@ -1,4 +1,4 @@
-package com.example.event_service.entity;
+package com.example.member_service.entity;
 
 import java.time.Instant;
 import jakarta.persistence.*;
@@ -6,7 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.example.event_service.enums.EventRole;
+import com.example.member_service.enums.EventRole;
+import com.example.member_service.enums.MemberStatus;
 
 @Entity
 @Table(name = "event_members")
@@ -19,14 +20,17 @@ public class EventMember {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id", nullable = false)
-    private Event event;
+    @Column(name = "event_id", nullable = false)
+    private String eventId;
 
+    @Column(name = "user_id", nullable = false)
     private Integer userId;
 
     @Enumerated(EnumType.STRING)
     private EventRole role;
+
+    @Enumerated(EnumType.STRING)
+    private MemberStatus status;
 
     private Instant joinedAt;
 }

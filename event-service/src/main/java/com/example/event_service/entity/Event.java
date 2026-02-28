@@ -26,6 +26,7 @@ public class Event {
     private Instant endTime;
     private String location;
     private String category;
+    private Boolean isPrivate;
 
     @Enumerated(EnumType.STRING)
     private EventStatus status;

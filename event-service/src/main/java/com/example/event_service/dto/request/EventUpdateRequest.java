@@ -19,4 +19,5 @@ public class EventUpdateRequest {
     private Instant endTime;
     private String location;
     private String category;
+    private Boolean isPrivate;
 }

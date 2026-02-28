@@ -4,10 +4,8 @@ import com.example.event_service.dto.request.EventCreateRequest;
 import com.example.event_service.dto.request.EventUpdateRequest;
 import com.example.event_service.dto.response.EventResponse;
 import com.example.event_service.entity.Event;
-import com.example.event_service.entity.EventMember;
-import com.example.event_service.enums.EventRole;
 import com.example.event_service.enums.EventStatus;
-import com.example.event_service.repository.EventMemberRepository;
+import com.example.event_service.client.MemberClient;
 import com.example.event_service.repository.EventRepository;
 import com.example.event_service.service.EventService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,7 @@ import java.util.stream.Collectors;
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
-    private final EventMemberRepository eventMemberRepository;
+    private final MemberClient memberClient;
 
     @Override
     @Transactional
@@ -36,21 +34,13 @@ public class EventServiceImpl implements EventService {
                 .endTime(request.getEndTime())
                 .location(request.getLocation())
                 .category(request.getCategory())
+                .isPrivate(request.getIsPrivate())
                 .status(EventStatus.SCHEDULED)
                 .ownerId(userId)
                 .createdAt(Instant.now())
                 .build();
 
         event = eventRepository.save(event);
-
-        EventMember eventMember = EventMember.builder()
-                .event(event)
-                .userId(userId)
-                .role(EventRole.OWNER)
-                .joinedAt(Instant.now())
-                .build();
-
-        eventMemberRepository.save(eventMember);
 
         return mapToResponse(event);
     }
@@ -67,11 +57,19 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
         if (!event.getOwnerId().equals(userId)) {
-            boolean isMember = eventMemberRepository.existsByEventIdAndUserId(eventId, userId);
+            boolean isMember = memberClient.isMember(eventId, userId);
             if (!isMember) {
                 throw new RuntimeException("Access denied: Not a member of this event");
             }
         }
+
+        return mapToResponse(event);
+    }
+
+    @Override
+    public EventResponse getEventInternal(String eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
 
         return mapToResponse(event);
     }
@@ -91,6 +89,7 @@ public class EventServiceImpl implements EventService {
         event.setEndTime(request.getEndTime());
         event.setLocation(request.getLocation());
         event.setCategory(request.getCategory());
+        event.setIsPrivate(request.getIsPrivate());
 
         event = eventRepository.save(event);
         return mapToResponse(event);
@@ -111,7 +110,7 @@ public class EventServiceImpl implements EventService {
 
     private void checkHasEditorOrOwnerPermission(String eventId, Integer userId, Event event) {
         if (!event.getOwnerId().equals(userId)) {
-            boolean isEditor = eventMemberRepository.existsByEventIdAndUserIdAndRole(eventId, userId, EventRole.EDITOR);
+            boolean isEditor = memberClient.checkMemberRole(eventId, userId, "EDITOR");
             if (!isEditor) {
                 throw new RuntimeException("Access denied: Requires EDITOR or OWNER role");
             }
@@ -128,6 +127,7 @@ public class EventServiceImpl implements EventService {
                 .endTime(event.getEndTime())
                 .location(event.getLocation())
                 .category(event.getCategory())
+                .isPrivate(event.getIsPrivate())
                 .status(event.getStatus())
                 .ownerId(event.getOwnerId())
                 .createdAt(event.getCreatedAt())

@@ -21,6 +21,7 @@ public class EventResponse {
     private Instant endTime;
     private String location;
     private String category;
+    private Boolean isPrivate;
     private EventStatus status;
     private Integer ownerId;
     private Instant createdAt;

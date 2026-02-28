@@ -13,6 +13,8 @@ public interface EventService {
 
     EventResponse getEvent(String eventId, Integer userId);
 
+    EventResponse getEventInternal(String eventId);
+
     EventResponse updateEvent(String eventId, EventUpdateRequest request, Integer userId);
 
     void deleteEvent(String eventId, Integer userId);

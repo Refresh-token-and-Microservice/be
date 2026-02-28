@@ -7,10 +7,9 @@ import com.example.event_service.dto.request.TaskUpdateRequest;
 import com.example.event_service.dto.response.TaskResponse;
 import com.example.event_service.entity.Event;
 import com.example.event_service.entity.Task;
-import com.example.event_service.enums.EventRole;
 import com.example.event_service.enums.EventStatus;
 import com.example.event_service.enums.TaskStatus;
-import com.example.event_service.repository.EventMemberRepository;
+import com.example.event_service.client.MemberClient;
 import com.example.event_service.repository.EventRepository;
 import com.example.event_service.repository.TaskRepository;
 import com.example.event_service.service.TaskService;
@@ -28,7 +27,7 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final EventRepository eventRepository;
-    private final EventMemberRepository eventMemberRepository;
+    private final MemberClient memberClient;
 
     @Override
     @Transactional
@@ -115,8 +114,7 @@ public class TaskServiceImpl implements TaskService {
         if (!isAssignee) {
             // Check if OWNER or EDITOR
             if (!event.getOwnerId().equals(requesterId)) {
-                boolean isEditor = eventMemberRepository.existsByEventIdAndUserIdAndRole(eventId, requesterId,
-                        EventRole.EDITOR);
+                boolean isEditor = memberClient.checkMemberRole(eventId, requesterId, "EDITOR");
                 if (!isEditor) {
                     throw new RuntimeException("Access denied: Requires EDITOR, OWNER role or must be the assignee");
                 }
@@ -172,8 +170,7 @@ public class TaskServiceImpl implements TaskService {
             if (event.getOwnerId().equals(assigneeId)) {
                 return;
             }
-            boolean isEditor = eventMemberRepository.existsByEventIdAndUserIdAndRole(eventId, assigneeId,
-                    EventRole.EDITOR);
+            boolean isEditor = memberClient.checkMemberRole(eventId, assigneeId, "EDITOR");
             if (!isEditor) {
                 throw new RuntimeException("Assignee must be an OWNER or EDITOR of the event");
             }
@@ -185,7 +182,7 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
         if (!event.getOwnerId().equals(userId)) {
-            boolean isEditor = eventMemberRepository.existsByEventIdAndUserIdAndRole(eventId, userId, EventRole.EDITOR);
+            boolean isEditor = memberClient.checkMemberRole(eventId, userId, "EDITOR");
             if (!isEditor) {
                 throw new RuntimeException("Access denied: Requires EDITOR or OWNER role");
             }
@@ -198,7 +195,7 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
         if (!event.getOwnerId().equals(userId)) {
-            boolean isMember = eventMemberRepository.existsByEventIdAndUserId(eventId, userId);
+            boolean isMember = memberClient.isMember(eventId, userId);
             if (!isMember) {
                 throw new RuntimeException("Access denied: Not a member of this event");
             }

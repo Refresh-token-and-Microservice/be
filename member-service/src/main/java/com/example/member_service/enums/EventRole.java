@@ -1,4 +1,4 @@
-package com.example.event_service.enums;
+package com.example.member_service.enums;
 
 public enum EventRole {
     OWNER,
