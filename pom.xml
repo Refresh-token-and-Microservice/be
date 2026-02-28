@@ -22,6 +22,7 @@
 		<module>orchestrator-service</module>
 		<module>common-dto</module>
 		<module>event-service</module>
+		<module>member-service</module>
 	</modules>
 
 	<properties>
