@@ -14,4 +14,7 @@ public interface MemberClient {
 
     @GetMapping("/events/{eventId}/members/{userId}/exists")
     Boolean isMember(@PathVariable("eventId") String eventId, @PathVariable("userId") Integer userId);
+
+    @GetMapping("/users/{userId}/events")
+    java.util.List<String> getUserEvents(@PathVariable("userId") Integer userId);
 }

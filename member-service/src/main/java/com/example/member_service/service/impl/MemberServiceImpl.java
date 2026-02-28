@@ -6,6 +6,7 @@ import com.example.member_service.dto.response.EventResponse;
 import com.example.member_service.dto.response.MemberResponse;
 import com.example.member_service.entity.EventMember;
 import com.example.member_service.enums.EventRole;
+import com.example.member_service.mapper.MemberMapper;
 import com.example.member_service.enums.MemberStatus;
 import com.example.member_service.repository.EventMemberRepository;
 import com.example.member_service.service.MemberService;
@@ -22,6 +23,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final EventMemberRepository eventMemberRepository;
     private final EventClient eventClient;
+    private final MemberMapper memberMapper;
 
     @Override
     @Transactional
@@ -55,7 +57,7 @@ public class MemberServiceImpl implements MemberService {
         newMember.setStatus(MemberStatus.INVITED);
         newMember = eventMemberRepository.save(newMember);
 
-        return mapToResponse(newMember);
+        return memberMapper.toResponse(newMember);
     }
 
     @Override
@@ -72,7 +74,7 @@ public class MemberServiceImpl implements MemberService {
         member.setJoinedAt(Instant.now());
         member = eventMemberRepository.save(member);
 
-        return mapToResponse(member);
+        return memberMapper.toResponse(member);
     }
 
     @Override
@@ -112,7 +114,7 @@ public class MemberServiceImpl implements MemberService {
                 member.setStatus(MemberStatus.JOINED);
                 member.setJoinedAt(Instant.now());
                 member = eventMemberRepository.save(member);
-                return mapToResponse(member);
+                return memberMapper.toResponse(member);
             }
         }
 
@@ -125,7 +127,7 @@ public class MemberServiceImpl implements MemberService {
                 .build();
 
         newMember = eventMemberRepository.save(newMember);
-        return mapToResponse(newMember);
+        return memberMapper.toResponse(newMember);
     }
 
     @Override
@@ -159,7 +161,7 @@ public class MemberServiceImpl implements MemberService {
             }
         }
         return eventMemberRepository.findByEventIdAndStatus(eventId, MemberStatus.JOINED)
-                .stream().map(this::mapToResponse)
+                .stream().map(memberMapper::toResponse)
                 .collect(java.util.stream.Collectors.toList());
     }
 
@@ -182,7 +184,7 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
         member.setRole(request.getRole());
-        return mapToResponse(eventMemberRepository.save(member));
+        return memberMapper.toResponse(eventMemberRepository.save(member));
     }
 
     @Override
@@ -220,14 +222,9 @@ public class MemberServiceImpl implements MemberService {
         eventMemberRepository.delete(member);
     }
 
-    private MemberResponse mapToResponse(EventMember member) {
-        return MemberResponse.builder()
-                .id(member.getId())
-                .eventId(member.getEventId())
-                .userId(member.getUserId())
-                .role(member.getRole())
-                .status(member.getStatus())
-                .joinedAt(member.getJoinedAt())
-                .build();
+    @Override
+    public java.util.List<String> getUserEvents(Integer userId) {
+        return eventMemberRepository.findByUserIdAndStatus(userId, MemberStatus.JOINED)
+                .stream().map(EventMember::getEventId).collect(java.util.stream.Collectors.toList());
     }
 }

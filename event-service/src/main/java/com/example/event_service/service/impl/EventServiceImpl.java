@@ -5,6 +5,7 @@ import com.example.event_service.dto.request.EventUpdateRequest;
 import com.example.event_service.dto.response.EventResponse;
 import com.example.event_service.entity.Event;
 import com.example.event_service.enums.EventStatus;
+import com.example.event_service.mapper.EventMapper;
 import com.example.event_service.client.MemberClient;
 import com.example.event_service.repository.EventRepository;
 import com.example.event_service.service.EventService;
@@ -22,6 +23,7 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final MemberClient memberClient;
+    private final EventMapper eventMapper;
 
     @Override
     @Transactional
@@ -42,13 +44,20 @@ public class EventServiceImpl implements EventService {
 
         event = eventRepository.save(event);
 
-        return mapToResponse(event);
+        return eventMapper.toResponse(event);
     }
 
     @Override
     public List<EventResponse> getMyEvents(Integer userId) {
-        List<Event> events = eventRepository.findMyEvents(userId);
-        return events.stream().map(this::mapToResponse).collect(Collectors.toList());
+        List<Event> ownedEvents = eventRepository.findByOwnerId(userId);
+
+        List<String> memberEventIds = memberClient.getUserEvents(userId);
+        List<Event> memberEvents = eventRepository.findAllById(memberEventIds);
+
+        java.util.Set<Event> allEvents = new java.util.HashSet<>(ownedEvents);
+        allEvents.addAll(memberEvents);
+
+        return allEvents.stream().map(eventMapper::toResponse).collect(Collectors.toList());
     }
 
     @Override
@@ -63,7 +72,7 @@ public class EventServiceImpl implements EventService {
             }
         }
 
-        return mapToResponse(event);
+        return eventMapper.toResponse(event);
     }
 
     @Override
@@ -71,7 +80,7 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
-        return mapToResponse(event);
+        return eventMapper.toResponse(event);
     }
 
     @Override
@@ -92,7 +101,7 @@ public class EventServiceImpl implements EventService {
         event.setIsPrivate(request.getIsPrivate());
 
         event = eventRepository.save(event);
-        return mapToResponse(event);
+        return eventMapper.toResponse(event);
     }
 
     @Override
@@ -115,22 +124,5 @@ public class EventServiceImpl implements EventService {
                 throw new RuntimeException("Access denied: Requires EDITOR or OWNER role");
             }
         }
-    }
-
-    private EventResponse mapToResponse(Event event) {
-        return EventResponse.builder()
-                .id(event.getId())
-                .title(event.getTitle())
-                .description(event.getDescription())
-                .thumbnailUrl(event.getThumbnailUrl())
-                .startTime(event.getStartTime())
-                .endTime(event.getEndTime())
-                .location(event.getLocation())
-                .category(event.getCategory())
-                .isPrivate(event.getIsPrivate())
-                .status(event.getStatus())
-                .ownerId(event.getOwnerId())
-                .createdAt(event.getCreatedAt())
-                .build();
     }
 }

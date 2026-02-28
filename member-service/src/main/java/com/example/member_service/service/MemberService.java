@@ -24,4 +24,6 @@ public interface MemberService {
     void removeMember(String eventId, Integer targetUserId, Integer requesterId);
 
     void leaveEvent(String eventId, Integer userId);
+
+    java.util.List<String> getUserEvents(Integer userId);
 }
